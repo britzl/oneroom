@@ -33,3 +33,6 @@ bundle_identifier = com.bitfront.oneroom
 default_texture_min_filter = nearest
 default_texture_mag_filter = nearest
 
+[factory]
+max_count = 1000
+

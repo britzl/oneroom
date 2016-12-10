@@ -1,3 +1,6 @@
+images {
+  image: "/assets/images/bullet.png"
+}
 animations {
   id: "explosion"
   images {

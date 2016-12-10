@@ -13,9 +13,11 @@ function init(self)
 	self.view = vmath.matrix4()
 end
 
-local WIDTH = 320
-local HEIGHT = 288
-local ZOOM = 3
+local render_settings = require "render.settings"
+
+local WIDTH = render_settings.WIDTH
+local HEIGHT = render_settings.HEIGHT
+local ZOOM = render_settings.ZOOM
 
 function update(self)
 	render.set_depth_mask(true)
