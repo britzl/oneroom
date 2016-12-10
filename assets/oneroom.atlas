@@ -1,0 +1,92 @@
+animations {
+  id: "explosion"
+  images {
+    image: "/assets/images/explosion1.png"
+  }
+  images {
+    image: "/assets/images/explosion2.png"
+  }
+  images {
+    image: "/assets/images/explosion3.png"
+  }
+  images {
+    image: "/assets/images/explosion4.png"
+  }
+  images {
+    image: "/assets/images/explosion5.png"
+  }
+  images {
+    image: "/assets/images/explosion6.png"
+  }
+  images {
+    image: "/assets/images/explosion7.png"
+  }
+  playback: PLAYBACK_ONCE_PINGPONG
+  fps: 10
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "player_run"
+  images {
+    image: "/assets/images/player_run1.png"
+  }
+  images {
+    image: "/assets/images/player_run2.png"
+  }
+  images {
+    image: "/assets/images/player_run3.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "player_jump"
+  images {
+    image: "/assets/images/player_jump1.png"
+  }
+  images {
+    image: "/assets/images/player_jump2.png"
+  }
+  images {
+    image: "/assets/images/player_jump3.png"
+  }
+  playback: PLAYBACK_LOOP_PINGPONG
+  fps: 10
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "player_idle"
+  images {
+    image: "/assets/images/player_idle1.png"
+  }
+  images {
+    image: "/assets/images/player_idle2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "blob_move"
+  images {
+    image: "/assets/images/blob_move1.png"
+  }
+  images {
+    image: "/assets/images/blob_move2.png"
+  }
+  images {
+    image: "/assets/images/blob_move3.png"
+  }
+  playback: PLAYBACK_LOOP_PINGPONG
+  fps: 5
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+margin: 0
+extrude_borders: 2
+inner_padding: 0

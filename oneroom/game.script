@@ -1,0 +1,41 @@
+local flow = require "ludobits.m.flow"
+
+local function spawn_enemy(self, type)
+	
+end
+
+
+function init(self)
+	self.enemies = {}
+	self.game_loop = flow(function ()
+		while true do
+			print("gameloop")
+			flow.delay(1)
+		end
+	end)
+end
+
+function final(self)
+	flow.stop(self.game_loop)
+	while #self.enemies do
+		go.delete(table.remove(self.enemies))
+	end
+end
+
+function update(self, dt)
+	flow.update(dt)
+end
+
+function on_message(self, message_id, message, sender)
+	flow.on_message(message_id, message, sender)
+end
+
+function on_input(self, action_id, action)
+    -- Add input-handling code here
+    -- Remove this function if not needed
+end
+
+function on_reload(self)
+    -- Add reload-handling code here
+    -- Remove this function if not needed
+end
