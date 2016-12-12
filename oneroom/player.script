@@ -1,7 +1,12 @@
+local broadcast = require "ludobits.m.broadcast"
+
+
 local CONTACT_POINT_RESPONSE = hash("contact_point_response")
 local COLLISION_RESPONSE = hash("collision_response")
 local WALL = hash("wall")
 local ENEMY = hash("enemy")
+local AMMO = hash("ammo")
+local WEAPON = hash("weapon")
 
 local IDLE = hash("idle")
 local RUN = hash("run")
@@ -35,6 +40,13 @@ function on_message(self, message_id, message, sender)
 	elseif message_id == COLLISION_RESPONSE then
 		if message.group == ENEMY then
 			go.delete(message.other_id)
+			broadcast.send("player_dead")
+		elseif message.group == AMMO then
+			go.delete(message.other_id)
+			msg.post("game", "pickup_ammo")
+		elseif message.group == WEAPON then
+			go.delete(message.other_id)
+			msg.post("game", "pickup_weapon")
 		end
 	end
 end

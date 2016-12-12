@@ -1,0 +1,239 @@
+go.property("player_spawn", vmath.vector3())
+go.property("enemy_spawn1", vmath.vector3())
+go.property("enemy_spawn2", vmath.vector3())
+go.property("enemy_spawn3", vmath.vector3())
+go.property("enemy_spawn4", vmath.vector3())
+
+local render_settings = require "render.settings"
+
+local TILE_SIZE = 16
+local W = render_settings.WIDTH / TILE_SIZE
+local H = render_settings.HEIGHT / TILE_SIZE
+
+local TILES = {
+	["WWWWWWWWW"] = 13,
+	
+	[".F.WWWWWW"] = 3,	-- bottom wall
+	[".W.WWW.F."] = 23,	-- top wall
+	[".W.FWW.W."] = 12,	-- right wall
+	[".W.WWFWW."] = 14,	-- left wall
+	
+	[".W.WWWWWW"] = 13, -- filled
+	
+	[".F.FWF.F."] = 7, -- pillar
+	
+	[".F.FWF.W."] = 6, -- top pillar
+	[".W.FWF.F."] = 26, -- bottom pillar
+	[".W.FWF.W."] = 16, -- middle pillar
+	
+	[".F.WWW.F."] = 33, -- horizontal thin wall middle
+	[".F.FWW.F."] = 32, -- horizontal thin wall left
+	[".F.WWF.F."] = 34, -- horizontal thin wall right
+	
+	[".W.WWWFW."] = 5,
+	[".W.WWWFWF"] = 15,
+	["WW.WWW.WF"] = 25,
+	[".F.WWWFWF"] = 35,
+	[".W.FWWFWF"] = 45,
+	[".W.WWFFW."] = 55,
+	[".F.WWW.WF"] = 65,
+	[".F.WWWFW."] = 75,
+	
+	[".F.FWW.WW"] = 2,	-- inner top left corner
+	[".F.WWFWW."] = 4,	-- inner top right corner
+	[".W.FWW.F."] = 22,	-- inner bottom left corner
+	[".W.WWF.F."] = 24, -- inner bottom right corner
+	
+	[".F.FWW.WF"] = 42,
+	[".F.WWFFW."] = 43,
+	
+}
+
+local function dump(level)
+	local s = "\n"
+	for y=H,1,-1 do
+		s = s .. ("%2.d"):format(y) .. " "
+		for x=1,W do
+			s = s .. (level[x][y].wall and "W" or "F")
+		end
+		s  = s .. "\n"
+	end
+	print(s)
+end
+
+local function deepcopy(orig)
+	local orig_type = type(orig)
+	local copy
+	if orig_type == 'table' then
+		copy = {}
+		for orig_key, orig_value in next, orig, nil do
+			copy[deepcopy(orig_key)] = deepcopy(orig_value)
+		end
+		setmetatable(copy, deepcopy(getmetatable(orig)))
+	else -- number, string, boolean, etc
+		copy = orig
+	end
+	return copy
+end
+
+
+local function random_position(level)
+	local x = 1
+	local y = 1
+	for i=1,100 do
+		x = math.random(2, W - 1)
+		y = math.random(2, H - 1)
+		if not level[x][y].wall and not level[x][y].spawn then
+			break
+		end
+	end
+	return x, y
+end
+
+local function create_spawn_position(level)
+	local x, y = random_position(level)
+	level[x][y].spawn = true
+	return vmath.vector3((TILE_SIZE / 2) + ((x - 1) * TILE_SIZE), (TILE_SIZE / 2) + ((y - 1) * TILE_SIZE), 1)
+end
+
+
+local function generate(self)
+	local l = {}
+	for x=0,W+1 do
+		l[x] = {}
+		for y=0,H+1 do
+			l[x][y] = { wall = false, x = x, y = y }
+		end
+	end
+	
+	for x=0,W+1 do
+		l[x][0].wall = true
+		l[x][1].wall = true
+		l[x][H].wall = true
+		l[x][H+1].wall = true
+	end
+	for y=0,H+1 do
+		l[0][y].wall = true
+		l[1][y].wall = true
+		l[W][y].wall = true
+		l[W+1][y].wall = true
+	end
+	
+	--dump()
+	
+	local function get_key(x, y)
+		local key = ""
+		key = key .. (l[x-1][y+1].wall and "W" or "F")
+		key = key .. (l[x+0][y+1].wall and "W" or "F")
+		key = key .. (l[x+1][y+1].wall and "W" or "F")
+		key = key .. (l[x-1][y+0].wall and "W" or "F")
+		key = key .. (l[x+0][y+0].wall and "W" or "F")
+		key = key .. (l[x+1][y+0].wall and "W" or "F")
+		key = key .. (l[x-1][y-1].wall and "W" or "F")
+		key = key .. (l[x+0][y-1].wall and "W" or "F")
+		key = key .. (l[x+1][y-1].wall and "W" or "F")
+		return key
+	end
+	
+	local function get_tile(key)
+		for pattern,tile in pairs(TILES) do
+			if key:match(pattern) then
+				return tile
+			end
+		end
+	end
+	
+	local function count_neighbors(x, y)
+		local count = 0
+		count = count + (l[x-1][y-1].wall and 1 or 0)
+		count = count + (l[x+0][y-1].wall and 1 or 0)
+		count = count + (l[x+1][y-1].wall and 1 or 0)
+		count = count + (l[x-1][y+0].wall and 1 or 0)
+		count = count + (l[x+1][y+0].wall and 1 or 0)
+		count = count + (l[x-1][y+1].wall and 1 or 0)
+		count = count + (l[x+0][y+1].wall and 1 or 0)
+		count = count + (l[x+1][y+1].wall and 1 or 0)
+		return count
+	end
+	
+	for x=3,W-2 do
+		for y=3,H-2 do
+			if math.random(1, 10) > 3 then
+				l[x][y].wall = true
+			end
+		end
+	end
+	
+	for i=1,2 do
+		local newl = deepcopy(l)
+		for x=2,W-1 do
+			for y=2,H-1 do
+				local count = count_neighbors(x, y)
+				if newl[x][y].wall then
+					if count < 2 then
+						newl[x][y].wall = true
+					elseif count > 3 then
+						newl[x][y].wall = false
+					end
+				else
+					if count == 3 then
+						newl[x][y].wall = true
+					end
+				end
+			end
+		end
+		l = newl
+	end
+		
+	for x=1,W do
+		for y=1,H do
+			local key = get_key(x, y)
+			tilemap.set_tile("#tilemap", "walls", x, y, get_tile(key) or 0)
+			--tilemap.set_tile("#tilemap", "walls", x, y, l[x][y].wall and 13 or 0)
+		end
+	end
+	
+	self.player_spawn = create_spawn_position(l)
+	self.enemy_spawn1 = create_spawn_position(l)
+	self.enemy_spawn2 = create_spawn_position(l)
+	self.enemy_spawn3 = create_spawn_position(l)
+	self.enemy_spawn4 = create_spawn_position(l)
+
+	go.set_position(self.enemy_spawn1, "spawnpoint1")
+	go.set_position(self.enemy_spawn2, "spawnpoint2")
+	go.set_position(self.enemy_spawn3, "spawnpoint3")
+	go.set_position(self.enemy_spawn4, "spawnpoint4")
+
+	return l
+end
+
+
+function init(self)
+	self.level = generate(self)
+end
+
+function final(self)
+	-- Add finalization code here
+	-- Remove this function if not needed
+end
+
+function update(self, dt)
+	-- Add update code here
+	-- Remove this function if not needed
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("generate") then
+		self.level = generate(self)
+	end
+end
+
+function on_input(self, action_id, action)
+	-- Add input-handling code here
+	-- Remove this function if not needed
+end
+
+function on_reload(self)
+	-- Add reload-handling code here
+	-- Remove this function if not needed
+end

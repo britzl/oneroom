@@ -1,5 +1,5 @@
 [project]
-title = One Room
+title = Overrun Room
 version = 0.1
 dependencies = https://github.com/britzl/ludobits/archive/master.zip
 
@@ -16,6 +16,7 @@ height = 864
 
 [physics]
 scale = 0.02
+debug = 0
 
 [script]
 shared_state = 1

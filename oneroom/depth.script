@@ -1,0 +1,21 @@
+local render_settings = require "render.settings"
+
+local MIN_Y = 0
+local MAX_Y = render_settings.HEIGHT
+
+function update(self, dt)
+	local pos = go.get_position()
+	local y = pos.y
+	if y > MAX_Y then
+		y = MAX_Y
+	end
+
+	local z = 1.0 - y / MAX_Y
+	pos.z = z
+	go.set_position(pos)
+end
+
+function on_reload(self)
+    -- Add reload-handling code here
+    -- Remove this function if not needed
+end

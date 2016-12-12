@@ -28,9 +28,9 @@ end
 
 function on_message(self, message_id, message, sender)
 	if message_id == COLLISION_RESPONSE then
-		if message.group == ENEMY then
-			go.delete(message.other_id)
-		elseif message.group == WALL then
+		if message.group == WALL then
+			go.delete()
+		elseif message.group == ENEMY then
 			go.delete()
 		end
 	end

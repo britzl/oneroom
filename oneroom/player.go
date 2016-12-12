@@ -1,4 +1,19 @@
 components {
+  id: "depth"
+  component: "/oneroom/depth.script"
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+components {
   id: "script"
   component: "/oneroom/player.script"
   position {
@@ -24,6 +39,8 @@ embedded_components {
   "group: \"player\"\n"
   "mask: \"wall\"\n"
   "mask: \"enemy\"\n"
+  "mask: \"ammo\"\n"
+  "mask: \"weapon\"\n"
   "embedded_collision_shape {\n"
   "  shapes {\n"
   "    shape_type: TYPE_BOX\n"

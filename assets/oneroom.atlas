@@ -1,6 +1,15 @@
 images {
   image: "/assets/images/bullet.png"
 }
+images {
+  image: "/assets/images/ammo.png"
+}
+images {
+  image: "/assets/images/spawnpoint.png"
+}
+images {
+  image: "/assets/images/weapon.png"
+}
 animations {
   id: "explosion"
   images {
