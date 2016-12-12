@@ -51,6 +51,16 @@ local WEAPONS = {
 			end
 		end
 	},
+	--[[{
+		name = "Minigun",
+		bullets_per_second = 20,
+		bullet_speed = 200,
+		magazine_size = 100,
+		reload_time = 3,
+		fire_bullet = function(self)
+			spawn_bullet(self, 0)
+		end
+	},--]]
 }
 
 local function update_text(text)
@@ -92,7 +102,7 @@ end
 
 function init(self)
 	math.randomseed(os.time())
-	change_weapon(self, 2)
+	change_weapon(self, 1)
 	broadcast.register(PLAYER_DEAD)
 	
 	self.game_loop = flow(function ()
