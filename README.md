@@ -5,3 +5,6 @@ This is [my entry](http://ludumdare.com/compo/ludum-dare-37/?action=preview&uid=
 * WASD or arrows to move
 * MOUSE to aim and fire
 * R to reload
+
+## Play Online
+HTML5 version: https://britzl.github.io/OverrunRoom/
