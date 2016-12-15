@@ -1,90 +1,16 @@
-local input = require "ludobits.m.input"
 local flow = require "ludobits.m.flow"
 local broadcast = require "ludobits.m.broadcast"
-local render_settings = require "render.settings"
-
-local ZOOM = render_settings.ZOOM
 
 local SPAWN_AMMO = hash("spawn_ammo")
 local SPAWN_WEAPON = hash("spawn_weapon")
 local PICKUP_AMMO = hash("pickup_ammo")
 local PICKUP_WEAPON = hash("pickup_weapon")
 local PLAYER_DEAD = hash("player_dead")
+local NEW_GAME = hash("new_game")
 
-local LEFT = hash("left")
-local RIGHT = hash("right")
-local UP = hash("up")
-local DOWN = hash("down")
-local FIRE = hash("fire")
-local RELOAD = hash("reload")
-
-local PLAYER_SPEED = 75
-
-
-local function spawn_bullet(self, angle_offset)
-	local player_pos = go.get_world_position("player")
-	local quat_offset = vmath.quat_rotation_z(math.rad(angle_offset or 0))
-	factory.create("#bulletfactory", player_pos, self.weapon_angle * quat_offset, { speed = self.weapon.bullet_speed })
-end
-
-
-local WEAPONS = {
-	{
-		name = "AK-97",
-		bullets_per_second = 10,
-		bullet_speed = 200,
-		magazine_size = 10,
-		reload_time = 1.5,
-		fire_bullet = function(self)
-			spawn_bullet(self, 0)
-		end
-	},
-	{
-		name = "Four barrelled shotgun",
-		bullets_per_second = 1,
-		bullet_speed = 200,
-		magazine_size = 4,
-		reload_time = 1.5,
-		fire_bullet = function(self)
-			for i=1,10 do
-				spawn_bullet(self, math.random(-20, 20))
-			end
-		end
-	},
-	--[[{
-		name = "Minigun",
-		bullets_per_second = 20,
-		bullet_speed = 200,
-		magazine_size = 100,
-		reload_time = 3,
-		fire_bullet = function(self)
-			spawn_bullet(self, 0)
-		end
-	},--]]
-}
 
 local function update_text(text)
 	label.set_text("hud#message", text)
-end
-
-local function update_weapon_text(self)
-	--label.set_text("hud#weapon", self.weapon.name)
-	if self.reloading then
-		update_text(("%s - RELOADING"):format(self.weapon.name))
-	elseif self.bullets_left == 0 then
-		update_text(("%s - RELOAD!"):format(self.weapon.name))
-	else
-		update_text(("%s - %d / %d (%d)"):format(self.weapon.name, self.bullets_left, self.weapon.magazine_size, self.magazines))
-	end
-end
-
-local function change_weapon(self, index)
-	self.weapon = WEAPONS[index]
-	self.weapon_angle = 0
-	self.bullets_left = self.weapon.magazine_size
-	self.magazines = 5
-	self.bullet_interval = 1 / self.weapon.bullets_per_second
-	update_weapon_text(self)
 end
 
 
@@ -102,19 +28,17 @@ end
 
 function init(self)
 	math.randomseed(os.time())
-	change_weapon(self, 1)
 	broadcast.register(PLAYER_DEAD)
 	
 	self.game_loop = flow(function ()
 		update_text("Overrun Room")
-		flow.delay(1)
+		--flow.delay(1)
 		update_text("A game by Bjoern Ritzl")
-		flow.delay(1)
+		--flow.delay(1)
 		update_text("Created for Ludum Dare Jam #37")
-		flow.delay(1)
+		--flow.delay(1)
 		while true do
-			update_weapon_text(self)
-			input.acquire()
+			broadcast.send(NEW_GAME)
 			go.set_position(go.get("level#script", "player_spawn"), "player")
 			local enemy_spawn_positions = {}
 			for i=1,4 do
@@ -132,96 +56,25 @@ function init(self)
 end
 
 function final(self)
-	flow.stop(self.game_loop)
+	flow.stop()
 	broadcast.unregister(PLAYER_DEAD)
 end
 
 function update(self, dt)
 	flow.update(dt)
-
-	local player_pos = go.get_position("player")
-	if input.is_pressed(LEFT) then
-		player_pos.x = player_pos.x - PLAYER_SPEED * dt
-		msg.post("player", "moving")
-	elseif input.is_pressed(RIGHT) then
-		player_pos.x = player_pos.x + PLAYER_SPEED * dt
-		msg.post("player", "moving")
-	end
-	if input.is_pressed(UP) then
-		player_pos.y = player_pos.y + PLAYER_SPEED * dt
-		msg.post("player", "moving")
-	elseif input.is_pressed(DOWN) then
-		player_pos.y = player_pos.y - PLAYER_SPEED * dt
-		msg.post("player", "moving")
-	end
-	if not input.is_pressed(LEFT) and not input.is_pressed(RIGHT) and not input.is_pressed(UP) and not input.is_pressed(DOWN) then
-		msg.post("player", "idling")
-	end
-	
-	if input.is_pressed(FIRE) then
-		local now = socket.gettime()
-		if not self.last_bullet or (now - self.last_bullet) >= self.bullet_interval then
-			if self.bullets_left > 0 then
-				self.weapon.fire_bullet(self)
-				self.bullets_left = self.bullets_left - 1
-				update_weapon_text(self)
-				msg.post("sounds#fire", "play_sound")
-			else
-				print("reload")
-				msg.post("sounds#noammo", "play_sound")
-			end
-			self.last_bullet = now
-		end
-	end
-	go.set_position(player_pos, "player")
 end
 
 
 function on_message(self, message_id, message, sender)
 	flow.on_message(message_id, message, sender)
-	if message_id == PICKUP_AMMO then
-		self.magazines = self.magazines + 1
-		update_weapon_text(self)
-		msg.post("sounds#pickup", "play_sound")
-	elseif message_id == PICKUP_WEAPON then
-		change_weapon(self, math.random(1, #WEAPONS))
-		msg.post("sounds#pickup", "play_sound")
-	elseif message_id == SPAWN_AMMO then
+	if message_id == SPAWN_AMMO then
 		spawn_ammo(self, message.position)
 	elseif message_id == SPAWN_WEAPON then
 		spawn_weapon(self, message.position)
 	elseif message_id == PLAYER_DEAD then
 		print("player_dead")
-		input.release()
 		go.set_position(vmath.vector3(-100, -100, 1), "player")
 		self.player_alive = false
-	end
-end
-
-function on_input(self, action_id, action)
-	input.update(action_id, action)
-	if not action_id then
-		local pos = go.get_world_position("player")
-		local angle = -math.atan2((action.x / ZOOM) - pos.x, (action.y / ZOOM) - pos.y)
-		self.weapon_angle = vmath.quat_rotation_z(angle)
-		--go.set_position(pos + vmath.rotate(self.weapon_angle, vmath.vector3(0, 20, 0)), "crosshair")
-	elseif action_id == RELOAD and action.released then
-		if self.magazines > 0 then
-			if not self.reloading then
-				self.reloading = true
-				self.bullets_left = 0
-				update_weapon_text(self)
-				flow(function()
-					flow.delay(self.weapon.reload_time)
-					self.magazines = self.magazines - 1
-					self.bullets_left = self.weapon.magazine_size
-					self.reloading = false
-					update_weapon_text(self)
-				end)
-			end
-		end
-	elseif action_id == hash("generate") and action.released then
-		msg.post("level", "generate")
 	end
 end
 
