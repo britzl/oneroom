@@ -95,7 +95,7 @@ end
 
 function init(self)
 	self.state = "idle"
-	change_weapon(self, 1)
+	self.velocity = vmath.vector3()
 	broadcast.register(NEW_GAME)
 end
 
@@ -198,6 +198,7 @@ function on_message(self, message_id, message, sender)
 	if message_id == NEW_GAME then
 		input.acquire()
 		self.velocity = vmath.vector3()
+		change_weapon(self, 1)
 		update_weapon_text(self)
 	end
 
