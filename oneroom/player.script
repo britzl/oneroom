@@ -31,16 +31,23 @@ local function spawn_bullet(angle, speed)
 	factory.create("game#bulletfactory", go.get_world_position(), angle, { speed = speed })
 end
 
+local function spawn_shell()
+	msg.post("game", "spawn_shell", { position = go.get_world_position() })
+end
+
 
 
 local WEAPONS = {
 	{
 		name = "AK-97",
 		bullets_per_second = 10,
-		magazine_size = 10,
+		magazine_size = 25,
 		reload_time = 1.5,
-		fire_bullet = function(angle)
+		move_and_fire = true,
+		fire_bullet = function(self, angle)
+			assert(angle)
 			spawn_bullet(angle, 200)
+			spawn_shell()
 		end
 	},
 	{
@@ -48,22 +55,32 @@ local WEAPONS = {
 		bullets_per_second = 1,
 		magazine_size = 4,
 		reload_time = 1.5,
-		fire_bullet = function(angle)
+		move_and_fire = true,
+		fire_bullet = function(self, angle)
+			assert(angle)
 			for i=1,10 do
 				spawn_bullet(angle * vmath.quat_rotation_z(math.rad(math.random(-20, 20))), 200)
+				spawn_shell()
 			end
 		end
 	},
-	--[[{
+	{
 		name = "Minigun",
 		bullets_per_second = 20,
 		bullet_speed = 200,
 		magazine_size = 100,
 		reload_time = 3,
-		fire_bullet = function(angle)
+		move_and_fire = false,
+		fire_bullet = function(self, angle)
 			spawn_bullet(angle, 200)
+			spawn_shell()
+			if self.bullets_fired_in_burts == 0 then
+				self.velocity = vmath.vector3()
+			else
+				self.velocity = self.velocity - vmath.rotate(angle, vmath.vector3(0, math.min(self.bullets_fired_in_burts, 50), 0))
+			end
 		end
-	},--]]
+	},
 }
 
 
@@ -84,7 +101,7 @@ end
 
 local function change_weapon(self, index)
 	self.weapon = WEAPONS[index]
-	self.weapon_angle = 0
+	self.weapon_angle = vmath.quat()
 	self.bullets_left = self.weapon.magazine_size
 	self.magazines = 5
 	self.bullet_interval = 1 / self.weapon.bullets_per_second
@@ -93,9 +110,18 @@ local function change_weapon(self, index)
 	update_weapon_text(self)
 end
 
+local function out_of_ammo(self)
+	return self.bullets_left == 0
+end
+
+local function can_fire_bullet(self)
+	return 
+end
+
 function init(self)
 	self.state = "idle"
 	self.velocity = vmath.vector3()
+	self.weapon_angle = vmath.quat()
 	broadcast.register(NEW_GAME)
 end
 
@@ -121,9 +147,6 @@ end
 function update(self, dt)
 	flow.update(dt)
 	
-	local pos = go.get_position()
-	pos = pos + self.velocity * dt
-
 	if not input.is_pressed(LEFT) and not input.is_pressed(RIGHT) and not input.is_pressed(UP) and not input.is_pressed(DOWN) then
 		change_state(IDLE)
 	else
@@ -134,8 +157,9 @@ function update(self, dt)
 		local now = socket.gettime()
 		if not self.last_bullet or (now - self.last_bullet) >= self.bullet_interval then
 			if self.bullets_left > 0 then
-				self.weapon.fire_bullet(self.weapon_angle)
+				self.weapon.fire_bullet(self, self.weapon_angle)
 				self.bullets_left = self.bullets_left - 1
+				self.bullets_fired_in_burts = self.bullets_fired_in_burts + 1
 				update_weapon_text(self)
 				msg.post("sounds#fire", "play_sound")
 			else
@@ -144,23 +168,32 @@ function update(self, dt)
 			end
 			self.last_bullet = now
 		end
+	else
+		self.bullets_fired_in_burts = 0
 	end
+	
+	local pos = go.get_position()
+	pos = pos + self.velocity * dt
 	go.set_position(pos)
 	self.correction = vmath.vector3()
 
-	if input.is_pressed(LEFT) then
-		self.velocity.x = -PLAYER_SPEED
-	elseif input.is_pressed(RIGHT) then
-		self.velocity.x = PLAYER_SPEED
-	else
-		self.velocity.x = 0
-	end
-	if input.is_pressed(UP) then
-		self.velocity.y = PLAYER_SPEED
-	elseif input.is_pressed(DOWN) then
-		self.velocity.y = -PLAYER_SPEED
-	else
-		self.velocity.y = 0
+	if not input.is_pressed(FIRE) or self.weapon.move_and_fire or self.bullets_left == 0 then
+		if input.is_pressed(LEFT) then
+			self.velocity.x = -PLAYER_SPEED
+			sprite.set_hflip("#sprite", false)
+		elseif input.is_pressed(RIGHT) then
+			self.velocity.x = PLAYER_SPEED
+			sprite.set_hflip("#sprite", true)
+		else
+			self.velocity.x = 0
+		end
+		if input.is_pressed(UP) then
+			self.velocity.y = PLAYER_SPEED
+		elseif input.is_pressed(DOWN) then
+			self.velocity.y = -PLAYER_SPEED
+		else
+			self.velocity.y = 0
+		end
 	end
 end
 

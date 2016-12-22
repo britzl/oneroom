@@ -3,6 +3,7 @@ local broadcast = require "ludobits.m.broadcast"
 
 local SPAWN_AMMO = hash("spawn_ammo")
 local SPAWN_WEAPON = hash("spawn_weapon")
+local SPAWN_SHELL = hash("spawn_shell")
 local PICKUP_AMMO = hash("pickup_ammo")
 local PICKUP_WEAPON = hash("pickup_weapon")
 local PLAYER_DEAD = hash("player_dead")
@@ -26,17 +27,26 @@ local function spawn_weapon(self, position)
 	factory.create("#weaponfactory", position)
 end
 
+local function spawn_shell(self, position)
+	while #self.shells > 100 do
+		go.delete(table.remove(self.shells, 1))
+	end
+	table.insert(self.shells, factory.create("#shellfactory", position))
+end
+
 function init(self)
 	math.randomseed(os.time())
 	broadcast.register(PLAYER_DEAD)
 	
-	self.game_loop = flow(function ()
+	self.shells = {}
+	
+	flow(function ()
 		update_text("Overrun Room")
-		flow.delay(1)
-		update_text("A game by Bjoern Ritzl")
+		--flow.delay(1)
+		--update_text("A game by Bjoern Ritzl")
 		flow.delay(1)
 		update_text("Created for Ludum Dare Jam #37")
-		flow.delay(1)
+		--flow.delay(1)
 		while true do
 			broadcast.send(NEW_GAME)
 			go.set_position(go.get("level#script", "player_spawn"), "player")
@@ -48,6 +58,9 @@ function init(self)
 			while self.player_alive do
 				spawn_enemy(self, enemy_spawn_positions[math.random(1, #enemy_spawn_positions)])
 				flow.delay(2)
+			end
+			while #self.shells > 0 do
+				go.delete(table.remove(self.shells))
 			end
 			msg.post("level", "generate")
 			flow.delay(0.1)
@@ -71,6 +84,8 @@ function on_message(self, message_id, message, sender)
 		spawn_ammo(self, message.position)
 	elseif message_id == SPAWN_WEAPON then
 		spawn_weapon(self, message.position)
+	elseif message_id == SPAWN_SHELL then
+		spawn_shell(self, message.position)
 	elseif message_id == PLAYER_DEAD then
 		print("player_dead")
 		go.set_position(vmath.vector3(-100, -100, 1), "player")

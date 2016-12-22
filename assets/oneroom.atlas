@@ -10,6 +10,9 @@ images {
 images {
   image: "/assets/images/weapon.png"
 }
+images {
+  image: "/assets/images/shell.png"
+}
 animations {
   id: "explosion"
   images {

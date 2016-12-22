@@ -382,6 +382,7 @@ embedded_instances {
   "mask: \\\"player\\\"\\n"
   "mask: \\\"enemy\\\"\\n"
   "mask: \\\"bullet\\\"\\n"
+  "mask: \\\"shell\\\"\\n"
   "linear_damping: 0.0\\n"
   "angular_damping: 0.0\\n"
   "locked_rotation: false\\n"
