@@ -3,6 +3,7 @@ local broadcast = require "ludobits.m.broadcast"
 
 local SPAWN_AMMO = hash("spawn_ammo")
 local SPAWN_WEAPON = hash("spawn_weapon")
+local SPAWN_POWERUP = hash("spawn_powerup")
 local SPAWN_SHELL = hash("spawn_shell")
 local PICKUP_AMMO = hash("pickup_ammo")
 local PICKUP_WEAPON = hash("pickup_weapon")
@@ -21,15 +22,19 @@ end
 
 
 local function spawn_enemy(self, position, type)
-	local id = factory.create(ENEMIES[math.random(1,#ENEMIES)], position)
+	factory.create(ENEMIES[math.random(1,#ENEMIES)], position)
+end
+
+local function spawn_powerup(self, position, type)
+	factory.create("#powerupfactory", position, nil, { type = type })
 end
 
 local function spawn_ammo(self, position)
-	factory.create("#ammofactory", position)
+	spawn_powerup(self, position, hash("ammo"))
 end
 
 local function spawn_weapon(self, position)
-	factory.create("#weaponfactory", position)
+	spawn_powerup(self, position, hash("weapon"))
 end
 
 local function spawn_shell(self, position)
@@ -89,6 +94,8 @@ function on_message(self, message_id, message, sender)
 		spawn_ammo(self, message.position)
 	elseif message_id == SPAWN_WEAPON then
 		spawn_weapon(self, message.position)
+	elseif message_id == SPAWN_POWERUP then
+		spawn_powerup(self, message.position, message.type)
 	elseif message_id == SPAWN_SHELL then
 		spawn_shell(self, message.position)
 	elseif message_id == PLAYER_DEAD then

@@ -4,9 +4,11 @@ function on_message(self, message_id, message, sender)
 	if message_id == self.message_id then
 		local random = math.random(1,100)
 		if random > 90 then
-			msg.post("game", "spawn_weapon", { position = go.get_position() })
+			msg.post("game", "spawn_powerup", { position = go.get_position(), type = hash("weapon") })
 		elseif random > 75 then
-			msg.post("game", "spawn_ammo", { position = go.get_position() })
+			msg.post("game", "spawn_powerup", { position = go.get_position(), type = hash("ammo") })
+		elseif random > 65 then
+			msg.post("game", "spawn_powerup", { position = go.get_position(), type = hash("medikit") })
 		end
 	end
 end

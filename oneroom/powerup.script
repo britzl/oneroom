@@ -1,0 +1,5 @@
+go.property("type", hash("ammo"))
+
+function init(self)
+	msg.post("#sprite", "play_animation", { id = self.type })
+end

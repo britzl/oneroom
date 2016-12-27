@@ -16,6 +16,12 @@ images {
 images {
   image: "/assets/images/flaming_bullet.png"
 }
+images {
+  image: "/assets/images/medikit.png"
+}
+images {
+  image: "/assets/images/rocket.png"
+}
 animations {
   id: "explosion_large"
   images {
@@ -40,7 +46,7 @@ animations {
     image: "/assets/images/explosion7.png"
   }
   playback: PLAYBACK_ONCE_PINGPONG
-  fps: 30
+  fps: 45
   flip_horizontal: 0
   flip_vertical: 0
 }

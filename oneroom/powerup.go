@@ -1,5 +1,5 @@
 components {
-  id: "script"
+  id: "depth"
   component: "/oneroom/depth.script"
   position {
     x: 0.0
@@ -13,6 +13,26 @@ components {
     w: 1.0
   }
 }
+components {
+  id: "powerup"
+  component: "/oneroom/powerup.script"
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  properties {
+    id: "type"
+    value: "medikit"
+    type: PROPERTY_TYPE_HASH
+  }
+}
 embedded_components {
   id: "collisionobject"
   type: "collisionobject"
@@ -21,7 +41,7 @@ embedded_components {
   "mass: 0.0\n"
   "friction: 0.1\n"
   "restitution: 0.5\n"
-  "group: \"ammo\"\n"
+  "group: \"powerup\"\n"
   "mask: \"player\"\n"
   "embedded_collision_shape {\n"
   "  shapes {\n"
@@ -64,7 +84,7 @@ embedded_components {
   id: "sprite"
   type: "sprite"
   data: "tile_set: \"/assets/oneroom.atlas\"\n"
-  "default_animation: \"ammo\"\n"
+  "default_animation: \"medikit\"\n"
   "material: \"/builtins/materials/sprite.material\"\n"
   "blend_mode: BLEND_MODE_ALPHA\n"
   ""

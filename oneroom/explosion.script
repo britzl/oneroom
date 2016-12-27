@@ -1,7 +1,14 @@
 go.property("type", hash("explosion_small"))
 
+local LARGE = hash("explosion_large")
+
+
 function init(self)
 	msg.post("#sprite", "play_animation", { id = self.type })
+	msg.post("#largecollisionobject", "disable")
+	if self.type == LARGE then
+		msg.post("#largecollisionobject", "enable")
+	end
 end
 
 function on_message(self, message_id, message, sender)

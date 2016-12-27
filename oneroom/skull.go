@@ -67,6 +67,21 @@ components {
     value: "1.0"
     type: PROPERTY_TYPE_NUMBER
   }
+  properties {
+    id: "min_follow_distance"
+    value: "100.0"
+    type: PROPERTY_TYPE_NUMBER
+  }
+  properties {
+    id: "max_follow_distance"
+    value: "100000.0"
+    type: PROPERTY_TYPE_NUMBER
+  }
+  properties {
+    id: "max_retreat_distance"
+    value: "100.0"
+    type: PROPERTY_TYPE_NUMBER
+  }
 }
 embedded_components {
   id: "collisionobject"
@@ -80,6 +95,7 @@ embedded_components {
   "mask: \"player\"\n"
   "mask: \"bullet\"\n"
   "mask: \"wall\"\n"
+  "mask: \"explosion\"\n"
   "embedded_collision_shape {\n"
   "  shapes {\n"
   "    shape_type: TYPE_SPHERE\n"

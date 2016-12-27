@@ -3,6 +3,9 @@ local render_settings = require "render.settings"
 go.property("speed", 200)
 go.property("type", hash("bullet"))
 go.property("enemy_bullet", false)
+go.property("damage", 1)
+go.property("exploding", false)
+
 
 local ENEMY = hash("enemy")
 local PLAYER = hash("player")
@@ -37,8 +40,18 @@ function on_message(self, message_id, message, sender)
 	if message_id == COLLISION_RESPONSE then
 		if message.group == WALL then
 			go.delete()
+			if self.exploding then
+				factory.create("game#explosionfactory", go.get_world_position(), nil, { type = hash("explosion_large") })
+			else
+				factory.create("game#explosionfactory", go.get_world_position(), nil, { type = hash("explosion_small") })
+			end
 		elseif message.group == ENEMY or message.group == PLAYER then
 			go.delete()
+			if self.exploding then
+				factory.create("game#explosionfactory", go.get_world_position(), nil, { type = hash("explosion_large") })
+			else
+				factory.create("game#explosionfactory", go.get_world_position(), nil, { type = hash("explosion_small") })
+			end
 		end
 	end
 end

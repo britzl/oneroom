@@ -1,5 +1,5 @@
 components {
-  id: "script"
+  id: "bullet"
   component: "/oneroom/bullet.script"
   position {
     x: 0.0

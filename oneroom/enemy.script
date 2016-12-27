@@ -3,11 +3,18 @@ local broadcast = require "ludobits.m.broadcast"
 go.property("health", 3)
 go.property("speed", 25)
 go.property("rate_of_fire", 0)
+go.property("min_fire_distance", 0)
+go.property("max_fire_distance", 100)
+go.property("min_follow_distance", 0)
+go.property("max_follow_distance", 100)
+go.property("min_retreat_distance", 0)
+go.property("max_retreat_distance", 0)
 
 local CONTACT_POINT_RESPONSE = hash("contact_point_response")
 local COLLISION_RESPONSE = hash("collision_response")
 local WALL = hash("wall")
 local BULLET = hash("bullet")
+local EXPLOSION = hash("explosion")
 
 local PLAYER_DEAD = hash("player_dead")
 
@@ -27,15 +34,23 @@ end
 function update(self, dt)
 	local player_pos = go.get_position("player")
 	local my_pos = go.get_position()
+	local distance_to_player = vmath.length(player_pos - my_pos)
+	
+	local direction = 0
+	if distance_to_player >= self.min_follow_distance and distance_to_player <= self.max_follow_distance then
+		direction = 1
+	elseif distance_to_player >= self.min_retreat_distance and distance_to_player <= self.max_retreat_distance then
+		direction = -1
+	end
+
 	local target_angle = -math.atan2(player_pos.x - my_pos.x, player_pos.y - my_pos.y)
 	local target_quat = vmath.quat_rotation_z(target_angle)
-	go.set_position(my_pos + self.correction + vmath.rotate(target_quat, NORTH) * self.speed * dt)
+	go.set_position(my_pos + self.correction + vmath.rotate(target_quat, NORTH) * self.speed * dt * direction)
 	
 	self.correction = vmath.vector3()
 	
 	if self.rate_of_fire > 0 then
-		local distance_to_player = vmath.length(player_pos - my_pos)
-		if distance_to_player < 200 then
+		if distance_to_player >= self.min_fire_distance and distance_to_player <= self.max_fire_distance then
 			self.time_until_next_bullet = self.time_until_next_bullet - dt
 			if self.time_until_next_bullet <= 0 then
 				self.time_until_next_bullet = 1 / self.rate_of_fire
@@ -57,12 +72,17 @@ function on_message(self, message_id, message, sender)
 		end
 	elseif message_id == COLLISION_RESPONSE then
 		if message.group == BULLET then
-			self.health = self.health - 1
+			local damage = go.get(msg.url(nil, message.other_id, "bullet"), hash("damage")) or 1
+			self.health = math.max(0, self.health - damage)
 			if self.health == 0 then
 				msg.post(".", "death")
 				go.delete()
-			else
-				factory.create("game#explosionfactory", go.get_world_position(), nil, { id = hash("explosion_small") })
+			end
+		elseif message.group == EXPLOSION then
+			self.health = math.max(0, self.health - 3)
+			if self.health == 0 then
+				msg.post(".", "death")
+				go.delete()
 			end
 		end
 	elseif message_id == PLAYER_DEAD then

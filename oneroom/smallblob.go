@@ -40,6 +40,7 @@ embedded_components {
   "mask: \"player\"\n"
   "mask: \"bullet\"\n"
   "mask: \"wall\"\n"
+  "mask: \"explosion\"\n"
   "embedded_collision_shape {\n"
   "  shapes {\n"
   "    shape_type: TYPE_SPHERE\n"
