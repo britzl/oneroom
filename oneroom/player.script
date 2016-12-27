@@ -10,6 +10,8 @@ local WALL = hash("wall")
 local ENEMY = hash("enemy")
 local AMMO = hash("ammo")
 local WEAPON = hash("weapon")
+local BULLET = hash("bullet")
+
 local NEW_GAME = hash("new_game")
 
 local IDLE = hash("idle")
@@ -26,9 +28,12 @@ local PLAYER_SPEED = 75
 
 local ZOOM = render_settings.ZOOM
 
+go.property("health", 10)
 
-local function spawn_bullet(angle, speed)
-	factory.create("game#bulletfactory", go.get_world_position(), angle, { speed = speed })
+local function spawn_bullet(angle, speed, offset)
+	offset = offset or vmath.vector3()
+	print(offset)
+	factory.create("game#bulletfactory", go.get_world_position() + offset, angle, { speed = speed })
 end
 
 local function spawn_shell()
@@ -66,13 +71,14 @@ local WEAPONS = {
 	},
 	{
 		name = "Minigun",
-		bullets_per_second = 20,
-		bullet_speed = 200,
+		bullets_per_second = 30,
+		bullet_speed = 500,
 		magazine_size = 100,
 		reload_time = 3,
 		move_and_fire = false,
 		fire_bullet = function(self, angle)
-			spawn_bullet(angle, 200)
+			--local offset = vmath.rotate(angle * vmath.quat_rotation_z(math.rad(-90)), vmath.vector3(0, math.random(-2, 2), 0))
+			spawn_bullet(angle, 200, offset)
 			spawn_shell()
 			if self.bullets_fired_in_burts == 0 then
 				self.velocity = vmath.vector3()
@@ -83,6 +89,9 @@ local WEAPONS = {
 	},
 }
 
+local function update_stats(self)
+	label.set_text("hud#stats", ("HEALTH: %d"):format(self.health))
+end
 
 local function update_text(text)
 	label.set_text("hud#message", text)
@@ -110,13 +119,19 @@ local function change_weapon(self, index)
 	update_weapon_text(self)
 end
 
-local function out_of_ammo(self)
-	return self.bullets_left == 0
+local function take_damage(self)
+	if self.health > 0 then
+		self.health = self.health - 1
+		update_stats(self)
+		if self.health == 0 then
+			input.release()
+			broadcast.send("player_dead")
+		else
+			factory.create("game#explosionfactory", go.get_world_position(), nil, { id = hash("explosion_small") })
+		end
+	end
 end
 
-local function can_fire_bullet(self)
-	return 
-end
 
 function init(self)
 	self.state = "idle"
@@ -231,8 +246,10 @@ function on_message(self, message_id, message, sender)
 	if message_id == NEW_GAME then
 		input.acquire()
 		self.velocity = vmath.vector3()
+		self.health = 10
 		change_weapon(self, 1)
 		update_weapon_text(self)
+		update_stats(self)
 	end
 
 	if message_id == CONTACT_POINT_RESPONSE then
@@ -249,8 +266,9 @@ function on_message(self, message_id, message, sender)
 	elseif message_id == COLLISION_RESPONSE then
 		if message.group == ENEMY then
 			go.delete(message.other_id)
-			input.release()
-			broadcast.send("player_dead")
+			take_damage(self)
+		elseif message.group == BULLET then
+			take_damage(self)
 		elseif message.group == AMMO then
 			go.delete(message.other_id)
 			self.magazines = self.magazines + 1

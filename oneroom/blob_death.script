@@ -1,0 +1,10 @@
+go.property("radius", 8)
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("death") then
+		for i=1,3 do
+			local pos = go.get_position() + vmath.vector3(math.random(-self.radius, self.radius), math.random(-self.radius, self.radius), 0)
+			factory.create("game#smallblobfactory", pos, nil, { health = 1 })
+		end
+	end
+end

@@ -1,0 +1,12 @@
+go.property("message_id", hash("death"))
+
+function on_message(self, message_id, message, sender)
+	if message_id == self.message_id then
+		local random = math.random(1,100)
+		if random > 90 then
+			msg.post("game", "spawn_weapon", { position = go.get_position() })
+		elseif random > 75 then
+			msg.post("game", "spawn_ammo", { position = go.get_position() })
+		end
+	end
+end

@@ -1,7 +1,8 @@
 local broadcast = require "ludobits.m.broadcast"
 
-
+go.property("health", 3)
 go.property("speed", 25)
+go.property("rate_of_fire", 0)
 
 local CONTACT_POINT_RESPONSE = hash("contact_point_response")
 local COLLISION_RESPONSE = hash("collision_response")
@@ -15,6 +16,7 @@ local NORTH = vmath.vector3(0, 1, 0)
 
 function init(self)
 	self.correction = vmath.vector3()
+	self.time_until_next_bullet = 0
 	broadcast.register("player_dead")
 end
 
@@ -29,8 +31,18 @@ function update(self, dt)
 	local target_quat = vmath.quat_rotation_z(target_angle)
 	go.set_position(my_pos + self.correction + vmath.rotate(target_quat, NORTH) * self.speed * dt)
 	
-	--print(self.correction)
 	self.correction = vmath.vector3()
+	
+	if self.rate_of_fire > 0 then
+		local distance_to_player = vmath.length(player_pos - my_pos)
+		if distance_to_player < 200 then
+			self.time_until_next_bullet = self.time_until_next_bullet - dt
+			if self.time_until_next_bullet <= 0 then
+				self.time_until_next_bullet = 1 / self.rate_of_fire
+				msg.post(".", "fire")
+			end 
+		end
+	end
 end
 
 function on_message(self, message_id, message, sender)
@@ -45,12 +57,12 @@ function on_message(self, message_id, message, sender)
 		end
 	elseif message_id == COLLISION_RESPONSE then
 		if message.group == BULLET then
-			go.delete()
-			local random = math.random(1,100)
-			if random > 90 then
-				msg.post("game", "spawn_weapon", { position = go.get_position() })
-			elseif random > 75 then
-				msg.post("game", "spawn_ammo", { position = go.get_position() })
+			self.health = self.health - 1
+			if self.health == 0 then
+				msg.post(".", "death")
+				go.delete()
+			else
+				factory.create("game#explosionfactory", go.get_world_position(), nil, { id = hash("explosion_small") })
 			end
 		end
 	elseif message_id == PLAYER_DEAD then

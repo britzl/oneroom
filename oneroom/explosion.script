@@ -1,0 +1,21 @@
+go.property("type", hash("explosion_small"))
+
+function init(self)
+	msg.post("#sprite", "play_animation", { id = self.type })
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("animation_done") then
+		go.delete()
+	end
+end
+
+function on_input(self, action_id, action)
+    -- Add input-handling code here
+    -- Remove this function if not needed
+end
+
+function on_reload(self)
+    -- Add reload-handling code here
+    -- Remove this function if not needed
+end

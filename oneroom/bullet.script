@@ -1,14 +1,21 @@
 local render_settings = require "render.settings"
 
-go.property("speed", 20)
+go.property("speed", 200)
+go.property("type", hash("bullet"))
+go.property("enemy_bullet", false)
 
 local ENEMY = hash("enemy")
+local PLAYER = hash("player")
 local WALL = hash("wall")
 local COLLISION_RESPONSE = hash("collision_response")
 
 function init(self)
-    -- Add initialization code here
-    -- Remove this function if not needed
+	msg.post("#sprite", "play_animation", { id = self.type })
+	if self.enemy_bullet then
+		msg.post("#enemycollisionobject", "disable")
+	else
+		msg.post("#playercollisionobject", "disable")
+	end
 end
 
 function final(self)
@@ -30,7 +37,7 @@ function on_message(self, message_id, message, sender)
 	if message_id == COLLISION_RESPONSE then
 		if message.group == WALL then
 			go.delete()
-		elseif message.group == ENEMY then
+		elseif message.group == ENEMY or message.group == PLAYER then
 			go.delete()
 		end
 	end

@@ -14,8 +14,28 @@ components {
   }
 }
 components {
-  id: "script"
-  component: "/oneroom/player.script"
+  id: "fire"
+  component: "/oneroom/radial_fire.script"
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  properties {
+    id: "bullet_type"
+    value: "flaming_bullet"
+    type: PROPERTY_TYPE_HASH
+  }
+}
+components {
+  id: "item_spawn"
+  component: "/oneroom/spawn_item.script"
   position {
     x: 0.0
     y: 0.0
@@ -28,6 +48,26 @@ components {
     w: 1.0
   }
 }
+components {
+  id: "script"
+  component: "/oneroom/enemy.script"
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  properties {
+    id: "rate_of_fire"
+    value: "1.0"
+    type: PROPERTY_TYPE_NUMBER
+  }
+}
 embedded_components {
   id: "collisionobject"
   type: "collisionobject"
@@ -36,19 +76,16 @@ embedded_components {
   "mass: 0.0\n"
   "friction: 0.1\n"
   "restitution: 0.5\n"
-  "group: \"player\"\n"
-  "mask: \"wall\"\n"
-  "mask: \"enemy\"\n"
-  "mask: \"ammo\"\n"
-  "mask: \"weapon\"\n"
-  "mask: \"shell\"\n"
+  "group: \"enemy\"\n"
+  "mask: \"player\"\n"
   "mask: \"bullet\"\n"
+  "mask: \"wall\"\n"
   "embedded_collision_shape {\n"
   "  shapes {\n"
   "    shape_type: TYPE_SPHERE\n"
   "    position {\n"
-  "      x: -0.5\n"
-  "      y: -0.5\n"
+  "      x: -1.0\n"
+  "      y: 0.0\n"
   "      z: 0.0\n"
   "    }\n"
   "    rotation {\n"
@@ -60,7 +97,7 @@ embedded_components {
   "    index: 0\n"
   "    count: 1\n"
   "  }\n"
-  "  data: 7.5\n"
+  "  data: 6.5\n"
   "}\n"
   "linear_damping: 0.0\n"
   "angular_damping: 0.0\n"
@@ -82,7 +119,7 @@ embedded_components {
   id: "sprite"
   type: "sprite"
   data: "tile_set: \"/assets/oneroom.atlas\"\n"
-  "default_animation: \"player_idle\"\n"
+  "default_animation: \"skulle_move\"\n"
   "material: \"/builtins/materials/sprite.material\"\n"
   "blend_mode: BLEND_MODE_ALPHA\n"
   ""

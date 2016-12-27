@@ -13,8 +13,11 @@ images {
 images {
   image: "/assets/images/shell.png"
 }
+images {
+  image: "/assets/images/flaming_bullet.png"
+}
 animations {
-  id: "explosion"
+  id: "explosion_large"
   images {
     image: "/assets/images/explosion1.png"
   }
@@ -37,7 +40,7 @@ animations {
     image: "/assets/images/explosion7.png"
   }
   playback: PLAYBACK_ONCE_PINGPONG
-  fps: 10
+  fps: 30
   flip_horizontal: 0
   flip_vertical: 0
 }
@@ -95,10 +98,64 @@ animations {
     image: "/assets/images/blob_move2.png"
   }
   images {
+    image: "/assets/images/blob_move1.png"
+  }
+  images {
     image: "/assets/images/blob_move3.png"
   }
-  playback: PLAYBACK_LOOP_PINGPONG
+  playback: PLAYBACK_LOOP_FORWARD
   fps: 5
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "skulle_move"
+  images {
+    image: "/assets/images/skull_run1.png"
+  }
+  images {
+    image: "/assets/images/skull_run2.png"
+  }
+  images {
+    image: "/assets/images/skull_run1.png"
+  }
+  images {
+    image: "/assets/images/skull_run3.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "smallblob_move"
+  images {
+    image: "/assets/images/smallblob_move1.png"
+  }
+  images {
+    image: "/assets/images/smallblob_move2.png"
+  }
+  images {
+    image: "/assets/images/smallblob_move1.png"
+  }
+  images {
+    image: "/assets/images/smallblob_move3.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 5
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "explosion_small"
+  images {
+    image: "/assets/images/explosion1.png"
+  }
+  images {
+    image: "/assets/images/explosion2.png"
+  }
+  playback: PLAYBACK_ONCE_PINGPONG
+  fps: 30
   flip_horizontal: 0
   flip_vertical: 0
 }
