@@ -262,7 +262,7 @@ function on_message(self, message_id, message, sender)
 		input.acquire()
 		self.velocity = vmath.vector3()
 		self.health = 10
-		change_weapon(self, 4)
+		change_weapon(self, 1)
 		update_weapon_text(self)
 		update_stats(self)
 	end
