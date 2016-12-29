@@ -10,42 +10,44 @@ local TILE_SIZE = 16
 local W = render_settings.WIDTH / TILE_SIZE
 local H = render_settings.HEIGHT / TILE_SIZE
 
+local seed = socket.gettime()
+
 local TILES = {
-	["WWWWWWWWW"] = 13,
+	{ pattern = "WWWWWWWWW", index = 13 },
 	
-	[".F.WWWWWW"] = 3,	-- bottom wall
-	[".W.WWW.F."] = 23,	-- top wall
-	[".W.FWW.W."] = 12,	-- right wall
-	[".W.WWFWW."] = 14,	-- left wall
+	{ pattern = ".W.WWWFWF", index = 15 },
+	{ pattern = ".W.WWWFW.", index = 5 },
+	{ pattern = "WW.WWW.WF", index = 25 },
+	{ pattern = ".F.WWWFWF", index = 35 },
+	{ pattern = ".W.FWWFWF", index = 45 },
+	{ pattern = ".W.WWFFW.", index = 55 },
+	{ pattern = ".F.WWWWWF", index = 65 },
+	{ pattern = ".F.WWWFW.", index = 75 },
+
+	{ pattern = ".F.WWWWWW", index = 3 },	-- bottom wall
+	{ pattern = ".W.WWW.F.", index = 23 },	-- top wall
+	{ pattern = ".W.FWW.W.", index = 12 },	-- right wall
+	{ pattern = ".W.WWFWW.", index = 14 },	-- left wall
 	
-	[".W.WWWWWW"] = 13, -- filled
+	{ pattern = ".W.WWWWWW", index = 13 }, -- filled
 	
-	[".F.FWF.F."] = 7, -- pillar
+	{ pattern = ".F.FWF.F.", index = 7 }, -- pillar
 	
-	[".F.FWF.W."] = 6, -- top pillar
-	[".W.FWF.F."] = 26, -- bottom pillar
-	[".W.FWF.W."] = 16, -- middle pillar
+	{ pattern = ".F.FWF.W.", index = 6 }, -- top pillar
+	{ pattern = ".W.FWF.F.", index = 26 }, -- bottom pillar
+	{ pattern = ".W.FWF.W.", index = 16 }, -- middle pillar
 	
-	[".F.WWW.F."] = 33, -- horizontal thin wall middle
-	[".F.FWW.F."] = 32, -- horizontal thin wall left
-	[".F.WWF.F."] = 34, -- horizontal thin wall right
+	{ pattern = ".F.WWW.F.", index = 33 }, -- horizontal thin wall middle
+	{ pattern = ".F.FWW.F.", index = 32 }, -- horizontal thin wall left
+	{ pattern = ".F.WWF.F.", index = 34 }, -- horizontal thin wall right
 	
-	[".W.WWWFW."] = 5,
-	[".W.WWWFWF"] = 15,
-	["WW.WWW.WF"] = 25,
-	[".F.WWWFWF"] = 35,
-	[".W.FWWFWF"] = 45,
-	[".W.WWFFW."] = 55,
-	[".F.WWW.WF"] = 65,
-	[".F.WWWFW."] = 75,
+	{ pattern = ".F.FWW.WW", index = 2 },	-- inner top left corner
+	{ pattern = ".F.WWFWW.", index = 4 },	-- inner top right corner
+	{ pattern = ".W.FWW.F.", index = 22 },	-- inner bottom left corner
+	{ pattern = ".W.WWF.F.", index = 24 }, -- inner bottom right corner
 	
-	[".F.FWW.WW"] = 2,	-- inner top left corner
-	[".F.WWFWW."] = 4,	-- inner top right corner
-	[".W.FWW.F."] = 22,	-- inner bottom left corner
-	[".W.WWF.F."] = 24, -- inner bottom right corner
-	
-	[".F.FWW.WF"] = 42,
-	[".F.WWFFW."] = 43,
+	{ pattern = ".F.FWW.WF", index = 42 },
+	{ pattern = ".F.WWFFW.", index = 43 },
 	
 }
 
@@ -97,6 +99,45 @@ local function create_spawn_position(level)
 end
 
 
+local function update_tilemap(level)
+	local function get_key(x, y)
+		local key = ""
+		key = key .. (level[x-1][y+1].wall and "W" or "F")
+		key = key .. (level[x+0][y+1].wall and "W" or "F")
+		key = key .. (level[x+1][y+1].wall and "W" or "F")
+		key = key .. (level[x-1][y+0].wall and "W" or "F")
+		key = key .. (level[x+0][y+0].wall and "W" or "F")
+		key = key .. (level[x+1][y+0].wall and "W" or "F")
+		key = key .. (level[x-1][y-1].wall and "W" or "F")
+		key = key .. (level[x+0][y-1].wall and "W" or "F")
+		key = key .. (level[x+1][y-1].wall and "W" or "F")
+		return key
+	end
+
+	local function get_wall_tile(key)
+		for _,tile in ipairs(TILES) do
+			if key:match(tile.pattern) then
+				return tile.index
+			end
+		end
+	end
+	
+	local function get_floor_tile(x, y)
+		math.randomseed(seed - x * 1034 - y * 1678)
+		return level[x][y].destroyed_wall and math.random(51, 53) or 1
+	end
+	
+	-- update tilemap
+	for x=1,W do
+		for y=1,H do
+			local key = get_key(x, y)
+			tilemap.set_tile("#tilemap", "floor", x, y, get_floor_tile(x, y))
+			tilemap.set_tile("#tilemap", "walls", x, y, get_wall_tile(key) or 0)
+		end
+	end
+	
+end
+
 local function generate(self)
 	local l = {}
 	for x=0,W+1 do
@@ -121,27 +162,6 @@ local function generate(self)
 	
 	--dump()
 	
-	local function get_key(x, y)
-		local key = ""
-		key = key .. (l[x-1][y+1].wall and "W" or "F")
-		key = key .. (l[x+0][y+1].wall and "W" or "F")
-		key = key .. (l[x+1][y+1].wall and "W" or "F")
-		key = key .. (l[x-1][y+0].wall and "W" or "F")
-		key = key .. (l[x+0][y+0].wall and "W" or "F")
-		key = key .. (l[x+1][y+0].wall and "W" or "F")
-		key = key .. (l[x-1][y-1].wall and "W" or "F")
-		key = key .. (l[x+0][y-1].wall and "W" or "F")
-		key = key .. (l[x+1][y-1].wall and "W" or "F")
-		return key
-	end
-	
-	local function get_tile(key)
-		for pattern,tile in pairs(TILES) do
-			if key:match(pattern) then
-				return tile
-			end
-		end
-	end
 	
 	local function count_neighbors(x, y)
 		local count = 0
@@ -156,6 +176,7 @@ local function generate(self)
 		return count
 	end
 	
+	-- randomly fill parts of the level with walls
 	for x=3,W-2 do
 		for y=3,H-2 do
 			if math.random(1, 10) > 3 then
@@ -164,6 +185,7 @@ local function generate(self)
 		end
 	end
 	
+	-- apply game of life algorithm to evolve level
 	for i=1,2 do
 		local newl = deepcopy(l)
 		for x=2,W-1 do
@@ -184,21 +206,15 @@ local function generate(self)
 		end
 		l = newl
 	end
-		
-	for x=1,W do
-		for y=1,H do
-			local key = get_key(x, y)
-			tilemap.set_tile("#tilemap", "walls", x, y, get_tile(key) or 0)
-			--tilemap.set_tile("#tilemap", "walls", x, y, l[x][y].wall and 13 or 0)
-		end
-	end
-	
+
 	self.player_spawn = create_spawn_position(l)
 	self.enemy_spawn1 = create_spawn_position(l)
 	self.enemy_spawn2 = create_spawn_position(l)
 	self.enemy_spawn3 = create_spawn_position(l)
 	self.enemy_spawn4 = create_spawn_position(l)
 
+	update_tilemap(l)
+	
 	go.set_position(self.enemy_spawn1, "spawnpoint1")
 	go.set_position(self.enemy_spawn2, "spawnpoint2")
 	go.set_position(self.enemy_spawn3, "spawnpoint3")
@@ -223,7 +239,19 @@ function update(self, dt)
 end
 
 function on_message(self, message_id, message, sender)
-	if message_id == hash("generate") then
+	if message_id == hash("destroy") then
+		local pos = go.get_world_position()
+		local delta = message.pos - go.get_world_position()
+		local x = 1 + math.floor(delta.x / TILE_SIZE)
+		local y = 1 + math.floor(delta.y / TILE_SIZE)
+		if x > 1 and x < (W - 0) and y > 1 and y < (H - 0) then
+			if  self.level[x][y].wall then
+				self.level[x][y].destroyed_wall = true
+				self.level[x][y].wall = false
+				update_tilemap(self.level)
+			end
+		end
+	elseif message_id == hash("generate") then
 		self.level = generate(self)
 	end
 end

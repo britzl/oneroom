@@ -13,6 +13,21 @@ components {
     w: 1.0
   }
 }
+components {
+  id: "smoketrail"
+  component: "/oneroom/smoketrail.particlefx"
+  position {
+    x: 0.0
+    y: -4.389867
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
 embedded_components {
   id: "enemycollisionobject"
   type: "collisionobject"

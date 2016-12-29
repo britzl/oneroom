@@ -8,6 +8,7 @@ function init(self)
 	msg.post("#largecollisionobject", "disable")
 	if self.type == LARGE then
 		msg.post("#largecollisionobject", "enable")
+		msg.post("camera", "shake", { shake = 10 })
 	end
 end
 

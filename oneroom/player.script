@@ -35,8 +35,8 @@ local ZOOM = render_settings.ZOOM
 
 go.property("health", 10)
 
-local function spawn_bullet(angle, speed, type, damage, exploding)
-	factory.create("game#bulletfactory", go.get_world_position(), angle, { speed = speed, type = type, enemy_bullet = false, damage = damage, exploding = exploding })
+local function spawn_bullet(angle, speed, type, damage, exploding, smoketrail)
+	factory.create("game#bulletfactory", go.get_world_position(), angle, { speed = speed, type = type, enemy_bullet = false, damage = damage, exploding = exploding, smoketrail = smoketrail })
 end
 
 local function spawn_shell()
@@ -98,7 +98,7 @@ local WEAPONS = {
 		reload_time = 1,
 		move_and_fire = false,
 		fire_bullet = function(self, angle)
-			spawn_bullet(angle, 200, ROCKET, 3, true)
+			spawn_bullet(angle, 200, ROCKET, 3, true, true)
 			self.velocity = -vmath.rotate(angle, vmath.vector3(0, 50, 0))
 		end
 	},
@@ -262,7 +262,7 @@ function on_message(self, message_id, message, sender)
 		input.acquire()
 		self.velocity = vmath.vector3()
 		self.health = 10
-		change_weapon(self, 1)
+		change_weapon(self, 4)
 		update_weapon_text(self)
 		update_stats(self)
 	end

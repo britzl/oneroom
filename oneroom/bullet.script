@@ -5,6 +5,7 @@ go.property("type", hash("bullet"))
 go.property("enemy_bullet", false)
 go.property("damage", 1)
 go.property("exploding", false)
+go.property("smoketrail", false)
 
 
 local ENEMY = hash("enemy")
@@ -19,11 +20,15 @@ function init(self)
 	else
 		msg.post("#playercollisionobject", "disable")
 	end
+	if self.smoketrail then
+		particlefx.play("#smoketrail")
+	else
+		msg.post("#smoketrail", "disable")
+	end
 end
 
 function final(self)
-    -- Add finalization code here
-    -- Remove this function if not needed
+	msg.post("#smoketrail", "disable")
 end
 
 function update(self, dt)
@@ -42,6 +47,11 @@ function on_message(self, message_id, message, sender)
 			go.delete()
 			if self.exploding then
 				factory.create("game#explosionfactory", go.get_world_position(), nil, { type = hash("explosion_large") })
+				for x=-1,1 do
+					for y=-1,1 do
+						msg.post("level", "destroy", { pos = go.get_world_position() + vmath.vector3(16 * x, 16 * y, 0) })
+					end
+				end
 			else
 				factory.create("game#explosionfactory", go.get_world_position(), nil, { type = hash("explosion_small") })
 			end

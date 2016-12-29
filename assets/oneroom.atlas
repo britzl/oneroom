@@ -22,6 +22,27 @@ images {
 images {
   image: "/assets/images/rocket.png"
 }
+images {
+  image: "/assets/images/explosion1.png"
+}
+images {
+  image: "/assets/images/explosion2.png"
+}
+images {
+  image: "/assets/images/explosion3.png"
+}
+images {
+  image: "/assets/images/explosion4.png"
+}
+images {
+  image: "/assets/images/explosion5.png"
+}
+images {
+  image: "/assets/images/explosion6.png"
+}
+images {
+  image: "/assets/images/explosion7.png"
+}
 animations {
   id: "explosion_large"
   images {
