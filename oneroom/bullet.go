@@ -14,7 +14,22 @@ components {
   }
 }
 components {
-  id: "smoketrail"
+  id: "flame"
+  component: "/oneroom/flame.particlefx"
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+components {
+  id: "smoke"
   component: "/oneroom/smoketrail.particlefx"
   position {
     x: 0.0

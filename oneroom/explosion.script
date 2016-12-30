@@ -1,29 +1,35 @@
+local broadcast = require "ludobits.m.broadcast"
+
 go.property("type", hash("explosion_small"))
 
 local LARGE = hash("explosion_large")
+local SMALL = hash("explosion_small")
+local FLAME = hash("flame")
 
+local PLAYER_DEAD = hash("player_dead")
 
 function init(self)
 	msg.post("#sprite", "play_animation", { id = self.type })
-	msg.post("#largecollisionobject", "disable")
+	msg.post("#large", "disable")
+	msg.post("#flame", "disable")
 	if self.type == LARGE then
-		msg.post("#largecollisionobject", "enable")
+		msg.post("#large", "enable")
 		msg.post("camera", "shake", { shake = 10 })
+	elseif self.type == FLAME then
+		msg.post("#flame", "enable")
 	end
+
+	broadcast.register("player_dead")
+end
+
+function final(self)
+	broadcast.unregister("player_dead")
 end
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash("animation_done") then
 		go.delete()
+	elseif message_id == PLAYER_DEAD then
+		go.delete()
 	end
-end
-
-function on_input(self, action_id, action)
-    -- Add input-handling code here
-    -- Remove this function if not needed
-end
-
-function on_reload(self)
-    -- Add reload-handling code here
-    -- Remove this function if not needed
 end

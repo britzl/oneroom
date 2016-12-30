@@ -1,7 +1,7 @@
 emitters {
   id: "emitter"
   mode: PLAY_MODE_LOOP
-  duration: 0.1
+  duration: 1.0
   space: EMISSION_SPACE_WORLD
   position {
     x: 0.0
@@ -11,23 +11,23 @@ emitters {
   rotation {
     x: 0.0
     y: 0.0
-    z: 1.0
-    w: 6.123234E-17
+    z: 0.0
+    w: 1.0
   }
   tile_source: "/assets/oneroom.atlas"
-  animation: "explosion1"
+  animation: "flame"
   material: "/builtins/materials/particlefx.material"
   blend_mode: BLEND_MODE_ADD
   particle_orientation: PARTICLE_ORIENTATION_DEFAULT
   inherit_velocity: 0.0
-  max_particle_count: 128
-  type: EMITTER_TYPE_BOX
+  max_particle_count: 50
+  type: EMITTER_TYPE_2DCONE
   start_delay: 0.0
   properties {
     key: EMITTER_KEY_SPAWN_RATE
     points {
       x: 0.0
-      y: 50.0
+      y: 10.0
       t_x: 1.0
       t_y: 0.0
     }
@@ -37,7 +37,7 @@ emitters {
     key: EMITTER_KEY_SIZE_X
     points {
       x: 0.0
-      y: 4.0
+      y: 3.0
       t_x: 1.0
       t_y: 0.0
     }
@@ -47,7 +47,7 @@ emitters {
     key: EMITTER_KEY_SIZE_Y
     points {
       x: 0.0
-      y: 4.0
+      y: 12.0
       t_x: 1.0
       t_y: 0.0
     }
@@ -67,7 +67,7 @@ emitters {
     key: EMITTER_KEY_PARTICLE_LIFE_TIME
     points {
       x: 0.0
-      y: 0.15
+      y: 0.5
       t_x: 1.0
       t_y: 0.0
     }
@@ -77,7 +77,7 @@ emitters {
     key: EMITTER_KEY_PARTICLE_SPEED
     points {
       x: 0.0
-      y: 100.0
+      y: 0.0
       t_x: 1.0
       t_y: 0.0
     }
@@ -87,7 +87,7 @@ emitters {
     key: EMITTER_KEY_PARTICLE_SIZE
     points {
       x: 0.0
-      y: 10.0
+      y: 8.0
       t_x: 1.0
       t_y: 0.0
     }
@@ -183,9 +183,9 @@ emitters {
     key: PARTICLE_KEY_ALPHA
     points {
       x: 0.0
-      y: 0.98818773
-      t_x: 0.9928957
-      t_y: 0.11898766
+      y: 0.0
+      t_x: 0.07194582
+      t_y: 0.99740857
     }
     points {
       x: 0.11320755

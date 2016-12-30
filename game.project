@@ -17,6 +17,8 @@ height = 864
 [physics]
 scale = 0.02
 debug = 0
+max_collisions = 200
+max_contacts = 100
 
 [script]
 shared_state = 1
@@ -39,4 +41,8 @@ max_count = 1000
 
 [sprite]
 max_count = 500
+
+[particle_fx]
+max_count = 300
+max_particle_count = 1000
 

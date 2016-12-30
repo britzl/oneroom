@@ -27,7 +27,15 @@ local FIRE = hash("fire")
 local RELOAD = hash("reload")
 
 local BULLET = hash("bullet")
+local FLAME = hash("flame")
 local ROCKET = hash("rocket")
+local FLAMING_BULLET = hash("flaming_bullet")
+
+local SMOKE_PARTICLES = hash("smoke")
+local FLAME_PARTICLES = hash("flame")
+
+local LARGE_EXPLOSION = hash("explosion_large")
+local FLAME_EXPLOSION = hash("flame")
 
 local PLAYER_SPEED = 75
 
@@ -35,8 +43,10 @@ local ZOOM = render_settings.ZOOM
 
 go.property("health", 10)
 
-local function spawn_bullet(angle, speed, type, damage, exploding, smoketrail)
-	factory.create("game#bulletfactory", go.get_world_position(), angle, { speed = speed, type = type, enemy_bullet = false, damage = damage, exploding = exploding, smoketrail = smoketrail })
+local BULLET_OFFSET = vmath.vector3(0, 4, 0)
+
+local function spawn_bullet(angle, properties)
+	factory.create("game#bulletfactory", go.get_world_position() + vmath.rotate(angle, BULLET_OFFSET), angle, properties)
 end
 
 local function spawn_shell()
@@ -53,8 +63,7 @@ local WEAPONS = {
 		reload_time = 1.5,
 		move_and_fire = true,
 		fire_bullet = function(self, angle)
-			assert(angle)
-			spawn_bullet(angle, 200, BULLET, 1)
+			spawn_bullet(angle, { speed = 200, type = BULLET, damage = 1 })
 			spawn_shell()
 		end
 	},
@@ -65,9 +74,8 @@ local WEAPONS = {
 		reload_time = 1.5,
 		move_and_fire = true,
 		fire_bullet = function(self, angle)
-			assert(angle)
 			for i=1,10 do
-				spawn_bullet(angle * vmath.quat_rotation_z(math.rad(math.random(-20, 20))), 200, BULLET, 2)
+				spawn_bullet(angle * vmath.quat_rotation_z(math.rad(math.random(-20, 20))), { speed = 200, type = BULLET, damage = 2 })
 				spawn_shell()
 			end
 		end
@@ -75,13 +83,12 @@ local WEAPONS = {
 	{
 		name = "Minigun",
 		bullets_per_second = 30,
-		bullet_speed = 500,
 		magazine_size = 100,
 		reload_time = 3,
 		move_and_fire = false,
 		fire_bullet = function(self, angle)
 			--local offset = vmath.rotate(angle * vmath.quat_rotation_z(math.rad(-90)), vmath.vector3(0, math.random(-2, 2), 0))
-			spawn_bullet(angle, 200, BULLET, 1)
+			spawn_bullet(angle, { speed = 200, type = BULLET, damage = 1 })
 			spawn_shell()
 			if self.bullets_fired_in_burts == 0 then
 				self.velocity = vmath.vector3()
@@ -93,13 +100,23 @@ local WEAPONS = {
 	{
 		name = "Tripple RPG",
 		bullets_per_second = 1,
-		bullet_speed = 200,
 		magazine_size = 3,
 		reload_time = 1,
 		move_and_fire = false,
 		fire_bullet = function(self, angle)
-			spawn_bullet(angle, 200, ROCKET, 3, true, true)
+			spawn_bullet(angle, { speed = 200, type = ROCKET, damage = 3, particles = SMOKE_PARTICLES, explosion = LARGE_EXPLOSION, destroy_walls = true })
 			self.velocity = -vmath.rotate(angle, vmath.vector3(0, 50, 0))
+		end
+	},
+	{
+		name = "Flamethrower",
+		bullets_per_second = 45,
+		magazine_size = 250,
+		reload_time = 2,
+		move_and_fire = true,
+		fire_bullet = function(self, angle)
+			angle = angle * vmath.quat_rotation_z(math.rad(math.random(-5, 5)))
+			spawn_bullet(angle, { speed = 100, type = FLAME, damage = 1, distance = 70, particles = FLAME_PARTICLES, explosion = FLAME_EXPLOSION })
 		end
 	},
 }

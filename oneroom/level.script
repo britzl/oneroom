@@ -17,7 +17,7 @@ local TILES = {
 	
 	{ pattern = ".W.WWWFWF", index = 15 },
 	{ pattern = ".W.WWWFW.", index = 5 },
-	{ pattern = "WW.WWW.WF", index = 25 },
+	{ pattern = ".W.WWW.WF", index = 25 },
 	{ pattern = ".F.WWWFWF", index = 35 },
 	{ pattern = ".W.FWWFWF", index = 45 },
 	{ pattern = ".W.WWFFW.", index = 55 },

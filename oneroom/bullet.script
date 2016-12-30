@@ -4,14 +4,20 @@ go.property("speed", 200)
 go.property("type", hash("bullet"))
 go.property("enemy_bullet", false)
 go.property("damage", 1)
-go.property("exploding", false)
-go.property("smoketrail", false)
+go.property("distance", 500)
+go.property("destroy_walls", false)
+go.property("explosion", hash("explosion_small"))
+go.property("particles", hash(""))
 
 
 local ENEMY = hash("enemy")
 local PLAYER = hash("player")
 local WALL = hash("wall")
 local COLLISION_RESPONSE = hash("collision_response")
+
+local SMOKE_PARTICLES = hash("smoke")
+local FLAME_PARTICLES = hash("flame")
+local EMPTY_HASH = hash("")
 
 function init(self)
 	msg.post("#sprite", "play_animation", { id = self.type })
@@ -20,15 +26,23 @@ function init(self)
 	else
 		msg.post("#playercollisionobject", "disable")
 	end
-	if self.smoketrail then
-		particlefx.play("#smoketrail")
-	else
-		msg.post("#smoketrail", "disable")
+	
+	msg.post("#smoke", "disable")
+	msg.post("#flame", "disable")
+	if self.particles == SMOKE_PARTICLES then
+		msg.post("#smoke", "enable")
+		particlefx.play("#smoke")
+	elseif self.particles == FLAME_PARTICLES then
+		msg.post("#flame", "enable")
+		particlefx.play("#flame")
 	end
+
+	self.initial_position = go.get_position()
 end
 
 function final(self)
-	msg.post("#smoketrail", "disable")
+	msg.post("#smoke", "disable")
+	msg.post("#flame", "disable")
 end
 
 function update(self, dt)
@@ -36,8 +50,12 @@ function update(self, dt)
 	local d = vmath.rotate(go.get_rotation(), vmath.vector3(0, 1, 0))
 	pos = pos + d * self.speed * dt
 	go.set_position(pos)
-	if pos.x < -16 or pos.x > render_settings.WIDTH + 16 or pos.y < -16 or pos.y > render_settings.HEIGHT + 16 then
+	local distance_traveled = vmath.length(pos - self.initial_position)
+	if pos.x < -16 or pos.x > render_settings.WIDTH + 16 or pos.y < -16 or pos.y > render_settings.HEIGHT + 16 or distance_traveled > self.distance then
 		go.delete()
+		if self.explosion ~= EMPTY_HASH then
+			factory.create("game#explosionfactory", go.get_world_position(), nil, { type = self.explosion })
+		end
 	end
 end
 
@@ -45,22 +63,20 @@ function on_message(self, message_id, message, sender)
 	if message_id == COLLISION_RESPONSE then
 		if message.group == WALL then
 			go.delete()
-			if self.exploding then
-				factory.create("game#explosionfactory", go.get_world_position(), nil, { type = hash("explosion_large") })
+			if self.explosion ~= EMPTY_HASH then
+				factory.create("game#explosionfactory", go.get_world_position(), nil, { type = self.explosion })
+			end
+			if self.destroy_walls then
 				for x=-1,1 do
 					for y=-1,1 do
 						msg.post("level", "destroy", { pos = go.get_world_position() + vmath.vector3(16 * x, 16 * y, 0) })
 					end
 				end
-			else
-				factory.create("game#explosionfactory", go.get_world_position(), nil, { type = hash("explosion_small") })
 			end
 		elseif message.group == ENEMY or message.group == PLAYER then
 			go.delete()
-			if self.exploding then
-				factory.create("game#explosionfactory", go.get_world_position(), nil, { type = hash("explosion_large") })
-			else
-				factory.create("game#explosionfactory", go.get_world_position(), nil, { type = hash("explosion_small") })
+			if self.explosion ~= EMPTY_HASH then
+				factory.create("game#explosionfactory", go.get_world_position(), nil, { type = self.explosion })
 			end
 		end
 	end

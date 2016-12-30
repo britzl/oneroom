@@ -186,6 +186,37 @@ animations {
   flip_horizontal: 0
   flip_vertical: 0
 }
+animations {
+  id: "flame"
+  images {
+    image: "/assets/images/flame1.png"
+  }
+  images {
+    image: "/assets/images/flame1.png"
+  }
+  images {
+    image: "/assets/images/flame2.png"
+  }
+  images {
+    image: "/assets/images/flame2.png"
+  }
+  images {
+    image: "/assets/images/flame3.png"
+  }
+  images {
+    image: "/assets/images/flame4.png"
+  }
+  images {
+    image: "/assets/images/flame5.png"
+  }
+  images {
+    image: "/assets/images/flame6.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 15
+  flip_horizontal: 0
+  flip_vertical: 0
+}
 margin: 0
 extrude_borders: 2
 inner_padding: 0

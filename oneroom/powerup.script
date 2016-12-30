@@ -1,5 +1,21 @@
+local broadcast = require "ludobits.m.broadcast"
+
 go.property("type", hash("ammo"))
+
+local PLAYER_DEAD = hash("player_dead")
 
 function init(self)
 	msg.post("#sprite", "play_animation", { id = self.type })
+	broadcast.register("player_dead")
 end
+
+function final(self)
+	broadcast.unregister("player_dead")
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == PLAYER_DEAD then
+		go.delete()
+	end
+end
+
