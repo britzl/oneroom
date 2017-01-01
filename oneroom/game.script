@@ -11,6 +11,11 @@ local PLAYER_DEAD = hash("player_dead")
 local NEW_GAME = hash("new_game")
 
 
+local TOGGLE_PROFILER = hash("toggle_profiler")
+local TOGGLE_DEBUG = hash("toggle_debug")
+local GENERATE = hash("generate")
+
+
 local ENEMIES = {
 	"#blobfactory",
 	"#skullfactory",
@@ -45,21 +50,23 @@ local function spawn_shell(self, position)
 end
 
 function init(self)
+	msg.post(".", "acquire_input_focus")
 	math.randomseed(os.time())
 	broadcast.register(PLAYER_DEAD)
 	
 	self.shells = {}
 	
 	flow(function ()
-		update_text("Overrun Room")
-		--flow.delay(1)
-		--update_text("A game by Bjoern Ritzl")
+		--[[update_text("Overrun Room")
+		flow.delay(1)
+		update_text("A game by Bjoern Ritzl")
 		flow.delay(1)
 		update_text("Created for Ludum Dare Jam #37")
-		--flow.delay(1)
+		flow.delay(1)--]]
 		while true do
+			math.randomseed(socket.gettime())
 			broadcast.send(NEW_GAME)
-			go.set_position(go.get("level#script", "player_spawn"), "player")
+			go.set_position(go.get("level#script", "player_spawn"), "player/player")
 			local enemy_spawn_positions = {}
 			for i=1,4 do
 				table.insert(enemy_spawn_positions, go.get("level#script", "enemy_spawn" .. i))
@@ -79,6 +86,7 @@ function init(self)
 end
 
 function final(self)
+	msg.post(".", "release_input_focus")
 	flow.stop()
 	broadcast.unregister(PLAYER_DEAD)
 end
@@ -99,9 +107,20 @@ function on_message(self, message_id, message, sender)
 	elseif message_id == SPAWN_SHELL then
 		spawn_shell(self, message.position)
 	elseif message_id == PLAYER_DEAD then
-		print("player_dead")
-		go.set_position(vmath.vector3(-100, -100, 1), "player")
+		go.set_position(vmath.vector3(-100, -100, 1), "player/player")
 		self.player_alive = false
+	end
+end
+
+function on_input(self, action_id, action)
+	if action.released then
+		if action_id == TOGGLE_DEBUG then
+			msg.post("@system:", "toggle_physics_debug")
+		elseif action_id == TOGGLE_PROFILER then
+			msg.post("@system:", "toggle_profile")
+		elseif action_id == GENERATE then
+			broadcast.send(PLAYER_DEAD)
+		end
 	end
 end
 

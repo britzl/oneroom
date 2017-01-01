@@ -79,12 +79,12 @@ instances {
     z: 1.0
   }
 }
-instances {
+collection_instances {
   id: "player"
-  prototype: "/oneroom/player.go"
+  collection: "/oneroom/player.collection"
   position {
-    x: 39.111145
-    y: 31.254503
+    x: 158.86778
+    y: 144.0
     z: 0.0
   }
   rotation {
@@ -509,6 +509,23 @@ embedded_instances {
   "  }\n"
   "}\n"
   "embedded_components {\n"
+  "  id: \"barrelfactory\"\n"
+  "  type: \"factory\"\n"
+  "  data: \"prototype: \\\"/oneroom/barrel.go\\\"\\n"
+  "\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "embedded_components {\n"
   "  id: \"collisionobject\"\n"
   "  type: \"collisionobject\"\n"
   "  data: \"collision_shape: \\\"/oneroom/level.tilemap\\\"\\n"
@@ -558,9 +575,29 @@ embedded_instances {
 embedded_instances {
   id: "sounds"
   data: "embedded_components {\n"
+  "  id: \"explosion\"\n"
+  "  type: \"sound\"\n"
+  "  data: \"sound: \\\"/assets/sounds/explosion.wav\\\"\\n"
+  "looping: 0\\n"
+  "group: \\\"master\\\"\\n"
+  "gain: 1.0\\n"
+  "\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "embedded_components {\n"
   "  id: \"fire\"\n"
   "  type: \"sound\"\n"
-  "  data: \"sound: \\\"/sounds/fire.wav\\\"\\n"
+  "  data: \"sound: \\\"/assets/sounds/fire.wav\\\"\\n"
   "looping: 0\\n"
   "group: \\\"master\\\"\\n"
   "gain: 1.0\\n"
@@ -580,7 +617,7 @@ embedded_instances {
   "embedded_components {\n"
   "  id: \"noammo\"\n"
   "  type: \"sound\"\n"
-  "  data: \"sound: \\\"/sounds/noammo.wav\\\"\\n"
+  "  data: \"sound: \\\"/assets/sounds/noammo.wav\\\"\\n"
   "looping: 0\\n"
   "group: \\\"master\\\"\\n"
   "gain: 1.0\\n"
@@ -600,7 +637,7 @@ embedded_instances {
   "embedded_components {\n"
   "  id: \"pickup\"\n"
   "  type: \"sound\"\n"
-  "  data: \"sound: \\\"/sounds/pickup.wav\\\"\\n"
+  "  data: \"sound: \\\"/assets/sounds/pickup.wav\\\"\\n"
   "looping: 0\\n"
   "group: \\\"master\\\"\\n"
   "gain: 1.0\\n"

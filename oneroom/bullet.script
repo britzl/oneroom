@@ -1,4 +1,6 @@
 local render_settings = require "render.settings"
+local explosions = require "oneroom.explosions"
+
 
 go.property("speed", 200)
 go.property("type", hash("bullet"))
@@ -54,7 +56,7 @@ function update(self, dt)
 	if pos.x < -16 or pos.x > render_settings.WIDTH + 16 or pos.y < -16 or pos.y > render_settings.HEIGHT + 16 or distance_traveled > self.distance then
 		go.delete()
 		if self.explosion ~= EMPTY_HASH then
-			factory.create("game#explosionfactory", go.get_world_position(), nil, { type = self.explosion })
+			explosions.create(go.get_world_position(), self.explosion)
 		end
 	end
 end
@@ -64,7 +66,7 @@ function on_message(self, message_id, message, sender)
 		if message.group == WALL then
 			go.delete()
 			if self.explosion ~= EMPTY_HASH then
-				factory.create("game#explosionfactory", go.get_world_position(), nil, { type = self.explosion })
+				explosions.create(go.get_world_position(), self.explosion)
 			end
 			if self.destroy_walls then
 				for x=-1,1 do
@@ -76,7 +78,7 @@ function on_message(self, message_id, message, sender)
 		elseif message.group == ENEMY or message.group == PLAYER then
 			go.delete()
 			if self.explosion ~= EMPTY_HASH then
-				factory.create("game#explosionfactory", go.get_world_position(), nil, { type = self.explosion })
+				explosions.create(go.get_world_position(), self.explosion)
 			end
 		end
 	end

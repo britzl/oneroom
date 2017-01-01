@@ -35,8 +35,16 @@ key_trigger {
   action: "reload"
 }
 key_trigger {
-  input: KEY_0
+  input: KEY_F3
   action: "generate"
+}
+key_trigger {
+  input: KEY_F1
+  action: "toggle_profiler"
+}
+key_trigger {
+  input: KEY_F2
+  action: "toggle_debug"
 }
 mouse_trigger {
   input: MOUSE_BUTTON_1

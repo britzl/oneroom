@@ -32,7 +32,7 @@ function final(self)
 end
 
 function update(self, dt)
-	local player_pos = go.get_position("player")
+	local player_pos = go.get_position("player/player")
 	local my_pos = go.get_position()
 	local distance_to_player = vmath.length(player_pos - my_pos)
 	
@@ -60,6 +60,14 @@ function update(self, dt)
 	end
 end
 
+local function take_damage(self, amount)
+	self.health = math.max(0, self.health - amount)
+	if self.health == 0 then
+		msg.post(".", "death")
+		go.delete()
+	end
+end
+
 function on_message(self, message_id, message, sender)
 	if message_id == CONTACT_POINT_RESPONSE then
 		if message.group == WALL then
@@ -73,17 +81,9 @@ function on_message(self, message_id, message, sender)
 	elseif message_id == COLLISION_RESPONSE then
 		if message.group == BULLET then
 			local damage = go.get(msg.url(nil, message.other_id, "bullet"), hash("damage")) or 1
-			self.health = math.max(0, self.health - damage)
-			if self.health == 0 then
-				msg.post(".", "death")
-				go.delete()
-			end
+			take_damage(self, damage)
 		elseif message.group == EXPLOSION then
-			self.health = math.max(0, self.health - 3)
-			if self.health == 0 then
-				msg.post(".", "death")
-				go.delete()
-			end
+			take_damage(self, 3)
 		end
 	elseif message_id == PLAYER_DEAD then
 		go.delete()

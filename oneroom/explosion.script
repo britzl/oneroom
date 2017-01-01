@@ -1,4 +1,5 @@
 local broadcast = require "ludobits.m.broadcast"
+local sounds = require "oneroom.sounds"
 
 go.property("type", hash("explosion_small"))
 
@@ -9,12 +10,14 @@ local FLAME = hash("flame")
 local PLAYER_DEAD = hash("player_dead")
 
 function init(self)
+	print("explosion", self.type)
 	msg.post("#sprite", "play_animation", { id = self.type })
 	msg.post("#large", "disable")
 	msg.post("#flame", "disable")
 	if self.type == LARGE then
 		msg.post("#large", "enable")
 		msg.post("camera", "shake", { shake = 10 })
+		sounds.explosion()
 	elseif self.type == FLAME then
 		msg.post("#flame", "enable")
 	end

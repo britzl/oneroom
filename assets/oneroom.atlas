@@ -43,6 +43,15 @@ images {
 images {
   image: "/assets/images/explosion7.png"
 }
+images {
+  image: "/assets/images/laser.png"
+}
+images {
+  image: "/assets/images/crosshair.png"
+}
+images {
+  image: "/assets/images/barrel.png"
+}
 animations {
   id: "explosion_large"
   images {

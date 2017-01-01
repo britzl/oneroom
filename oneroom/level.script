@@ -89,13 +89,14 @@ local function random_position(level)
 			break
 		end
 	end
-	return x, y
+	local pos = vmath.vector3((TILE_SIZE / 2) + ((x - 1) * TILE_SIZE), (TILE_SIZE / 2) + ((y - 1) * TILE_SIZE), 1) 
+	return x, y, pos
 end
 
 local function create_spawn_position(level)
-	local x, y = random_position(level)
+	local x, y, pos = random_position(level)
 	level[x][y].spawn = true
-	return vmath.vector3((TILE_SIZE / 2) + ((x - 1) * TILE_SIZE), (TILE_SIZE / 2) + ((y - 1) * TILE_SIZE), 1)
+	return pos
 end
 
 
@@ -219,6 +220,11 @@ local function generate(self)
 	go.set_position(self.enemy_spawn2, "spawnpoint2")
 	go.set_position(self.enemy_spawn3, "spawnpoint3")
 	go.set_position(self.enemy_spawn4, "spawnpoint4")
+
+	for i=1,math.random(1, 4) do
+		local x, y, pos = random_position(l)
+		factory.create("#barrelfactory", pos)
+	end
 
 	return l
 end
