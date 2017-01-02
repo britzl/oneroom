@@ -5,233 +5,50 @@ go.property("enemy_spawn3", vmath.vector3())
 go.property("enemy_spawn4", vmath.vector3())
 
 local render_settings = require "render.settings"
+local astar = require "utils.astar"
+local floodfill = require "utils.floodfill"
+local level = require "oneroom.level"
 
 local TILE_SIZE = 16
 local W = render_settings.WIDTH / TILE_SIZE
 local H = render_settings.HEIGHT / TILE_SIZE
 
-local seed = socket.gettime()
+local FLOODFILL_INTERVAL = 0.5
 
-local TILES = {
-	{ pattern = "WWWWWWWWW", index = 13 },
-	
-	{ pattern = ".W.WWWFWF", index = 15 },
-	{ pattern = ".W.WWWFW.", index = 5 },
-	{ pattern = ".W.WWW.WF", index = 25 },
-	{ pattern = ".F.WWWFWF", index = 35 },
-	{ pattern = ".W.FWWFWF", index = 45 },
-	{ pattern = ".W.WWFFW.", index = 55 },
-	{ pattern = ".F.WWWWWF", index = 65 },
-	{ pattern = ".F.WWWFW.", index = 75 },
-
-	{ pattern = ".F.WWWWWW", index = 3 },	-- bottom wall
-	{ pattern = ".W.WWW.F.", index = 23 },	-- top wall
-	{ pattern = ".W.FWW.W.", index = 12 },	-- right wall
-	{ pattern = ".W.WWFWW.", index = 14 },	-- left wall
-	
-	{ pattern = ".W.WWWWWW", index = 13 }, -- filled
-	
-	{ pattern = ".F.FWF.F.", index = 7 }, -- pillar
-	
-	{ pattern = ".F.FWF.W.", index = 6 }, -- top pillar
-	{ pattern = ".W.FWF.F.", index = 26 }, -- bottom pillar
-	{ pattern = ".W.FWF.W.", index = 16 }, -- middle pillar
-	
-	{ pattern = ".F.WWW.F.", index = 33 }, -- horizontal thin wall middle
-	{ pattern = ".F.FWW.F.", index = 32 }, -- horizontal thin wall left
-	{ pattern = ".F.WWF.F.", index = 34 }, -- horizontal thin wall right
-	
-	{ pattern = ".F.FWW.WW", index = 2 },	-- inner top left corner
-	{ pattern = ".F.WWFWW.", index = 4 },	-- inner top right corner
-	{ pattern = ".W.FWW.F.", index = 22 },	-- inner bottom left corner
-	{ pattern = ".W.WWF.F.", index = 24 }, -- inner bottom right corner
-	
-	{ pattern = ".F.FWW.WF", index = 42 },
-	{ pattern = ".F.WWFFW.", index = 43 },
-	
-}
-
-local function dump(level)
-	local s = "\n"
-	for y=H,1,-1 do
-		s = s .. ("%2.d"):format(y) .. " "
-		for x=1,W do
-			s = s .. (level[x][y].wall and "W" or "F")
-		end
-		s  = s .. "\n"
-	end
-	print(s)
-end
-
-local function deepcopy(orig)
-	local orig_type = type(orig)
-	local copy
-	if orig_type == 'table' then
-		copy = {}
-		for orig_key, orig_value in next, orig, nil do
-			copy[deepcopy(orig_key)] = deepcopy(orig_value)
-		end
-		setmetatable(copy, deepcopy(getmetatable(orig)))
-	else -- number, string, boolean, etc
-		copy = orig
-	end
-	return copy
-end
-
-
-local function random_position(level)
-	local x = 1
-	local y = 1
-	for i=1,100 do
-		x = math.random(2, W - 1)
-		y = math.random(2, H - 1)
-		if not level[x][y].wall and not level[x][y].spawn then
-			break
-		end
-	end
-	local pos = vmath.vector3((TILE_SIZE / 2) + ((x - 1) * TILE_SIZE), (TILE_SIZE / 2) + ((y - 1) * TILE_SIZE), 1) 
-	return x, y, pos
-end
-
-local function create_spawn_position(level)
-	local x, y, pos = random_position(level)
-	level[x][y].spawn = true
-	return pos
-end
-
-
-local function update_tilemap(level)
-	local function get_key(x, y)
-		local key = ""
-		key = key .. (level[x-1][y+1].wall and "W" or "F")
-		key = key .. (level[x+0][y+1].wall and "W" or "F")
-		key = key .. (level[x+1][y+1].wall and "W" or "F")
-		key = key .. (level[x-1][y+0].wall and "W" or "F")
-		key = key .. (level[x+0][y+0].wall and "W" or "F")
-		key = key .. (level[x+1][y+0].wall and "W" or "F")
-		key = key .. (level[x-1][y-1].wall and "W" or "F")
-		key = key .. (level[x+0][y-1].wall and "W" or "F")
-		key = key .. (level[x+1][y-1].wall and "W" or "F")
-		return key
-	end
-
-	local function get_wall_tile(key)
-		for _,tile in ipairs(TILES) do
-			if key:match(tile.pattern) then
-				return tile.index
-			end
-		end
-	end
-	
-	local function get_floor_tile(x, y)
-		math.randomseed(seed - x * 1034 - y * 1678)
-		return level[x][y].destroyed_wall and math.random(51, 53) or 1
-	end
-	
-	-- update tilemap
-	for x=1,W do
-		for y=1,H do
-			local key = get_key(x, y)
-			tilemap.set_tile("#tilemap", "floor", x, y, get_floor_tile(x, y))
-			tilemap.set_tile("#tilemap", "walls", x, y, get_wall_tile(key) or 0)
-		end
-	end
-	
+local function fill(self, x, y)
+	--local t = socket.gettime()
+	floodfill.fill(x, y, self.level.layout)
+	--print(socket.gettime() - t)
+	--self.level.dumpcost()
 end
 
 local function generate(self)
-	local l = {}
-	for x=0,W+1 do
-		l[x] = {}
-		for y=0,H+1 do
-			l[x][y] = { wall = false, x = x, y = y }
-		end
-	end
-	
-	for x=0,W+1 do
-		l[x][0].wall = true
-		l[x][1].wall = true
-		l[x][H].wall = true
-		l[x][H+1].wall = true
-	end
-	for y=0,H+1 do
-		l[0][y].wall = true
-		l[1][y].wall = true
-		l[W][y].wall = true
-		l[W+1][y].wall = true
-	end
-	
-	--dump()
-	
-	
-	local function count_neighbors(x, y)
-		local count = 0
-		count = count + (l[x-1][y-1].wall and 1 or 0)
-		count = count + (l[x+0][y-1].wall and 1 or 0)
-		count = count + (l[x+1][y-1].wall and 1 or 0)
-		count = count + (l[x-1][y+0].wall and 1 or 0)
-		count = count + (l[x+1][y+0].wall and 1 or 0)
-		count = count + (l[x-1][y+1].wall and 1 or 0)
-		count = count + (l[x+0][y+1].wall and 1 or 0)
-		count = count + (l[x+1][y+1].wall and 1 or 0)
-		return count
-	end
-	
-	-- randomly fill parts of the level with walls
-	for x=3,W-2 do
-		for y=3,H-2 do
-			if math.random(1, 10) > 3 then
-				l[x][y].wall = true
-			end
-		end
-	end
-	
-	-- apply game of life algorithm to evolve level
-	for i=1,2 do
-		local newl = deepcopy(l)
-		for x=2,W-1 do
-			for y=2,H-1 do
-				local count = count_neighbors(x, y)
-				if newl[x][y].wall then
-					if count < 2 then
-						newl[x][y].wall = true
-					elseif count > 3 then
-						newl[x][y].wall = false
-					end
-				else
-					if count == 3 then
-						newl[x][y].wall = true
-					end
-				end
-			end
-		end
-		l = newl
-	end
 
-	self.player_spawn = create_spawn_position(l)
-	self.enemy_spawn1 = create_spawn_position(l)
-	self.enemy_spawn2 = create_spawn_position(l)
-	self.enemy_spawn3 = create_spawn_position(l)
-	self.enemy_spawn4 = create_spawn_position(l)
-
-	update_tilemap(l)
+	self.level = level.create(msg.url("."), W, H, TILE_SIZE)
+	self.level.generate()
 	
+	self.player_spawn = self.level.create_spawn_position()
+	self.enemy_spawn1 = self.level.create_spawn_position()
+	self.enemy_spawn2 = self.level.create_spawn_position()
+	self.enemy_spawn3 = self.level.create_spawn_position()
+	self.enemy_spawn4 = self.level.create_spawn_position()
+
 	go.set_position(self.enemy_spawn1, "spawnpoint1")
 	go.set_position(self.enemy_spawn2, "spawnpoint2")
 	go.set_position(self.enemy_spawn3, "spawnpoint3")
 	go.set_position(self.enemy_spawn4, "spawnpoint4")
 
 	for i=1,math.random(1, 4) do
-		local x, y, pos = random_position(l)
+		local x, y, pos = self.level.random_position()
 		factory.create("#barrelfactory", pos)
 	end
-
-	return l
+	
+	fill(self, 1, 1)
 end
 
 
 function init(self)
-	self.level = generate(self)
+	generate(self)
 end
 
 function final(self)
@@ -239,26 +56,15 @@ function final(self)
 	-- Remove this function if not needed
 end
 
-function update(self, dt)
-	-- Add update code here
-	-- Remove this function if not needed
-end
-
 function on_message(self, message_id, message, sender)
-	if message_id == hash("destroy") then
-		local pos = go.get_world_position()
-		local delta = message.pos - go.get_world_position()
-		local x = 1 + math.floor(delta.x / TILE_SIZE)
-		local y = 1 + math.floor(delta.y / TILE_SIZE)
-		if x > 1 and x < (W - 0) and y > 1 and y < (H - 0) then
-			if  self.level[x][y].wall then
-				self.level[x][y].destroyed_wall = true
-				self.level[x][y].wall = false
-				update_tilemap(self.level)
-			end
-		end
+	if message_id == hash("floodfill") then
+		local x, y = self.level.vector3_to_xy(message.position)
+		fill(self, x, y)
+	elseif message_id == hash("destroy") then
+		local x, y = self.level.vector3_to_xy(message.pos)
+		self.level.destroy(x, y)
 	elseif message_id == hash("generate") then
-		self.level = generate(self)
+		generate(self)
 	end
 end
 

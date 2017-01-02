@@ -1,4 +1,5 @@
 local broadcast = require "ludobits.m.broadcast"
+local level = require "oneroom.level"
 
 go.property("health", 3)
 go.property("speed", 25)
@@ -35,6 +36,10 @@ function update(self, dt)
 	local player_pos = go.get_position("player/player")
 	local my_pos = go.get_position()
 	local distance_to_player = vmath.length(player_pos - my_pos)
+
+	local x, y = level.current.vector3_to_xy(my_pos)
+	local lowestcost = level.current.lowestcost(x, y)
+	player_pos = level.current.xy_to_vector3(lowestcost.x, lowestcost.y)
 	
 	local direction = 0
 	if distance_to_player >= self.min_follow_distance and distance_to_player <= self.max_follow_distance then
@@ -42,6 +47,7 @@ function update(self, dt)
 	elseif distance_to_player >= self.min_retreat_distance and distance_to_player <= self.max_retreat_distance then
 		direction = -1
 	end
+	direction = 1
 
 	local target_angle = -math.atan2(player_pos.x - my_pos.x, player_pos.y - my_pos.y)
 	local target_quat = vmath.quat_rotation_z(target_angle)

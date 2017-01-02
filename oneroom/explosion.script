@@ -10,7 +10,6 @@ local FLAME = hash("flame")
 local PLAYER_DEAD = hash("player_dead")
 
 function init(self)
-	print("explosion", self.type)
 	msg.post("#sprite", "play_animation", { id = self.type })
 	msg.post("#large", "disable")
 	msg.post("#flame", "disable")

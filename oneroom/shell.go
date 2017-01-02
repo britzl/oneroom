@@ -1,5 +1,5 @@
 components {
-  id: "script"
+  id: "depth"
   component: "/oneroom/depth.script"
   position {
     x: 0.0
@@ -14,7 +14,7 @@ components {
   }
 }
 components {
-  id: "script1"
+  id: "shell"
   component: "/oneroom/shell.script"
   position {
     x: 0.0

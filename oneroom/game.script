@@ -1,5 +1,8 @@
 local flow = require "ludobits.m.flow"
 local broadcast = require "ludobits.m.broadcast"
+local timers = require "utils.timers"
+local floodfill = require "utils.floodfill"
+local level = require "oneroom.level"
 
 local SPAWN_AMMO = hash("spawn_ammo")
 local SPAWN_WEAPON = hash("spawn_weapon")
@@ -72,10 +75,16 @@ function init(self)
 				table.insert(enemy_spawn_positions, go.get("level#script", "enemy_spawn" .. i))
 			end
 			self.player_alive = true
-			while self.player_alive do
+
+			timers.every(2, function()
 				spawn_enemy(self, enemy_spawn_positions[math.random(1, #enemy_spawn_positions)])
-				flow.delay(2)
-			end
+			end)
+			timers.every(0.5, function()
+				msg.post("level", "floodfill", { position = go.get_position("game:/player/player") })
+			end)
+			flow.until_true(function() return not self.player_alive end)
+			timers.stop()
+
 			while #self.shells > 0 do
 				go.delete(table.remove(self.shells))
 			end
@@ -88,11 +97,13 @@ end
 function final(self)
 	msg.post(".", "release_input_focus")
 	flow.stop()
+	timers.stop()
 	broadcast.unregister(PLAYER_DEAD)
 end
 
 function update(self, dt)
 	flow.update(dt)
+	timers.update(dt)
 end
 
 
