@@ -52,6 +52,12 @@ images {
 images {
   image: "/assets/images/barrel.png"
 }
+images {
+  image: "/assets/images/swing.png"
+}
+images {
+  image: "/assets/images/sword.png"
+}
 animations {
   id: "explosion_large"
   images {

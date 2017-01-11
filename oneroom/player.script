@@ -26,6 +26,7 @@ local UP = hash("up")
 local DOWN = hash("down")
 local FIRE = hash("fire")
 local RELOAD = hash("reload")
+local MELEE = hash("melee")
 
 local BULLET = hash("bullet")
 local FLAME = hash("flame")
@@ -189,6 +190,7 @@ function init(self)
 	self.velocity = vmath.vector3()
 	self.weapon_angle = vmath.quat()
 	broadcast.register(NEW_GAME)
+	msg.post("melee", "disable")
 end
 
 
@@ -239,15 +241,22 @@ function update(self, dt)
 	local pos = go.get_position()
 	pos = pos + self.velocity * dt
 	go.set_position(pos)
+	go.set_position(pos, "lasersight")
 	self.correction = vmath.vector3()
 
 	if not input.is_pressed(FIRE) or self.weapon.move_and_fire or self.bullets_left == 0 then
 		if input.is_pressed(LEFT) then
 			self.velocity.x = -PLAYER_SPEED
-			sprite.set_hflip("#sprite", false)
+			go.set_rotation(vmath.quat_rotation_y(math.rad(0)))
+			--sprite.set_hflip("#sprite", false)
+			--sprite.set_hflip("melee#weapon", false)
+			--sprite.set_hflip("melee#swing", false)
 		elseif input.is_pressed(RIGHT) then
 			self.velocity.x = PLAYER_SPEED
-			sprite.set_hflip("#sprite", true)
+			go.set_rotation(vmath.quat_rotation_y(math.rad(180)))
+			--sprite.set_hflip("#sprite", true)
+			--sprite.set_hflip("melee#weapon", true)
+			--sprite.set_hflip("melee#swing", true)
 		else
 			self.velocity.x = 0
 		end
@@ -275,7 +284,7 @@ function on_input(self, action_id, action)
 		go.set("lasersight#script", "angle", quat)
 		go.set("lasersight#script", "target", target)
 		
-		go.set_position(target - pos, "crosshair")
+		go.set_position(pos + target - pos, "crosshair")
 	elseif action_id == RELOAD and action.released then
 		if self.magazines > 0 then
 			if not self.reloading then
@@ -291,6 +300,13 @@ function on_input(self, action_id, action)
 				end)
 			end
 		end
+	elseif action_id == MELEE and action.released then
+		msg.post("melee", "enable")
+		go.cancel_animations("melee", "euler.z")
+		go.set("melee", "euler.z", 0)
+		go.animate("melee", "euler.z", go.PLAYBACK_ONCE_FORWARD, 360, go.EASING_LINEAR, 0.1, 0, function()
+			msg.post("melee", "disable")
+		end)
 	end
 end
 

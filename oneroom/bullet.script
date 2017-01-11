@@ -16,6 +16,7 @@ local ENEMY = hash("enemy")
 local PLAYER = hash("player")
 local WALL = hash("wall")
 local COLLISION_RESPONSE = hash("collision_response")
+local DESTROY_WALL = hash("destroy_wall")
 
 local SMOKE_PARTICLES = hash("smoke")
 local FLAME_PARTICLES = hash("flame")
@@ -71,7 +72,7 @@ function on_message(self, message_id, message, sender)
 			if self.destroy_walls then
 				for x=-1,1 do
 					for y=-1,1 do
-						msg.post("level", "destroy", { pos = go.get_world_position() + vmath.vector3(16 * x, 16 * y, 0) })
+						msg.post("game", DESTROY_WALL, { pos = go.get_world_position() + vmath.vector3(16 * x, 16 * y, 0) })
 					end
 				end
 			end

@@ -11,11 +11,6 @@ function init(self)
 	end)
 end
 
-function final(self)
-    -- Add finalization code here
-    -- Remove this function if not needed
-end
-
 function on_message(self, message_id, message, sender)
 	if message_id == CONTACT_POINT_RESPONSE then
 		if message.group == WALL then
@@ -24,14 +19,4 @@ function on_message(self, message_id, message, sender)
 			go.set_position(go.get_position() + message.normal * message.distance)
 		end
 	end
-end
-
-function on_input(self, action_id, action)
-    -- Add input-handling code here
-    -- Remove this function if not needed
-end
-
-function on_reload(self)
-    -- Add reload-handling code here
-    -- Remove this function if not needed
 end

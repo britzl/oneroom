@@ -1,20 +1,8 @@
-local broadcast = require "ludobits.m.broadcast"
 local explosions = require "oneroom.explosions"
 
 local COLLISION_RESPONSE = hash("collision_response")
 local EXPLOSION = hash("explosion")
 local BULLET = hash("bullet")
-
-local PLAYER_DEAD = hash("player_dead")
-
-
-function init(self)
-	broadcast.register("player_dead")
-end
-
-function final(self)
-	broadcast.unregister("player_dead")
-end
 
 function on_message(self, message_id, message, sender)
 	if message_id == COLLISION_RESPONSE then
@@ -22,7 +10,5 @@ function on_message(self, message_id, message, sender)
 			explosions.large(go.get_world_position())
 			go.delete()
 		end
-	elseif message_id == PLAYER_DEAD then
-		go.delete()
 	end
 end
