@@ -15,8 +15,8 @@ end
 
 local render_settings = require "render.settings"
 
-local WIDTH = render_settings.WIDTH
-local HEIGHT = render_settings.HEIGHT
+local WIDTH = render_settings.MAP_WIDTH
+local HEIGHT = render_settings.MAP_HEIGHT
 local ZOOM = render_settings.ZOOM
 
 function update(self)

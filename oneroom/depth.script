@@ -1,7 +1,7 @@
 local render_settings = require "render.settings"
 
 local MIN_Y = 0
-local MAX_Y = render_settings.HEIGHT
+local MAX_Y = render_settings.MAP_HEIGHT
 
 function update(self, dt)
 	local pos = go.get_position()

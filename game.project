@@ -1,5 +1,5 @@
 [project]
-title = Overrun Room
+title = OverrunRoom
 version = 0.1
 dependencies = https://github.com/britzl/ludobits/archive/master.zip
 

@@ -1,5 +1,25 @@
 name: "game"
 instances {
+  id: "console"
+  prototype: "/defcon/console.go"
+  position {
+    x: 1608.0
+    y: 1024.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+}
+instances {
   id: "spawnpoint1"
   prototype: "/oneroom/spawnpoint.go"
   position {
@@ -119,6 +139,21 @@ embedded_instances {
   "}\n"
   "components {\n"
   "  id: \"script1\"\n"
+  "  component: \"/oneroom/foo.script\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "components {\n"
+  "  id: \"shakescript\"\n"
   "  component: \"/oneroom/camera_shake.script\"\n"
   "  position {\n"
   "    x: 0.0\n"
@@ -136,46 +171,6 @@ embedded_instances {
   position {
     x: 0.0
     y: 0.0
-    z: 0.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
-embedded_instances {
-  id: "crosshair"
-  data: "embedded_components {\n"
-  "  id: \"sprite\"\n"
-  "  type: \"sprite\"\n"
-  "  data: \"tile_set: \\\"/assets/oneroom.atlas\\\"\\n"
-  "default_animation: \\\"bullet\\\"\\n"
-  "material: \\\"/builtins/materials/sprite.material\\\"\\n"
-  "blend_mode: BLEND_MODE_ALPHA\\n"
-  "\"\n"
-  "  position {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "  }\n"
-  "  rotation {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "    w: 1.0\n"
-  "  }\n"
-  "}\n"
-  ""
-  position {
-    x: -16.264433
-    y: 7.349885
     z: 0.0
   }
   rotation {
@@ -439,13 +434,13 @@ embedded_instances {
   "  x: 128.0\\n"
   "  y: 32.0\\n"
   "  z: 0.0\\n"
-  "  w: 1.0\\n"
+  "  w: 0.0\\n"
   "}\\n"
   "scale {\\n"
   "  x: 1.0\\n"
   "  y: 1.0\\n"
   "  z: 1.0\\n"
-  "  w: 1.0\\n"
+  "  w: 0.0\\n"
   "}\\n"
   "color {\\n"
   "  x: 1.0\\n"
@@ -493,13 +488,13 @@ embedded_instances {
   "  x: 128.0\\n"
   "  y: 32.0\\n"
   "  z: 0.0\\n"
-  "  w: 1.0\\n"
+  "  w: 0.0\\n"
   "}\\n"
   "scale {\\n"
   "  x: 1.0\\n"
   "  y: 1.0\\n"
   "  z: 1.0\\n"
-  "  w: 1.0\\n"
+  "  w: 0.0\\n"
   "}\\n"
   "color {\\n"
   "  x: 1.0\\n"

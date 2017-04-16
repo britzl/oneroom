@@ -50,6 +50,34 @@ function M.create(url, W, H, TILE_SIZE)
 	local seed = socket.gettime()
 	
 	local tilemap_url = msg.url(url.socket, url.path, "tilemap")
+	
+	local function minmax(a, b)
+		return math.min(a, b), math.max(a, b)
+	end
+	
+	local function limit(x, y)
+		return math.min(math.max(1, x), W), math.min(math.max(1, y), H)
+	end
+	
+	local function fill(x1, y1, x2, y2, wall)
+		x1, y1 = limit(x1, y1)
+		x2, y2 = limit(x2, y2)
+		x1, x2 = minmax(x1, x2)
+		y1, y2 = minmax(y1, y2)
+		local l = instance.layout
+		for x=x1,x2 do
+			for y=y1,y2 do
+				l[x][y] = { wall = wall, x = x, y = y }
+			end
+		end
+	end
+
+	local function borders()
+		fill(0, 0, W+1, 1, true)
+		fill(0, H, W+1, H+1, true)
+		fill(0, 0, 1, H+1, true)
+		fill(W, 0, W+1, H+1, true)
+	end
 
 	function instance.clear()
 		instance.layout = {}
@@ -60,23 +88,86 @@ function M.create(url, W, H, TILE_SIZE)
 				l[x][y] = { wall = false, x = x, y = y }
 			end
 		end
-		for x=0,W+1 do
-			l[x][0].wall = true
-			l[x][1].wall = true
-			l[x][H].wall = true
-			l[x][H+1].wall = true
-		end
-		for y=0,H+1 do
-			l[0][y].wall = true
-			l[1][y].wall = true
-			l[W][y].wall = true
-			l[W+1][y].wall = true
-		end
+		
+		borders()
+	end
+
+	local function pillar(x1, y1, x2, y2)
+		local x = math.random(x1, x2)
+		local y = math.random(y1, y2)
+		fill(x, y, x, y)
 	end
 	
 	function instance.generate()
 		instance.clear()
-		instance.layout = conway.apply(instance.layout, W, H)
+		fill(1, 1, W, H, true)
+		
+		math.randomseed(os.time())
+		
+		
+		local x1 = math.random(2, W - 2)
+		local y1 = math.random(2, H - 2)
+		local x2, y2
+
+		for i=1,15 do
+			
+			if i % 2 == 0 then
+				y1 = y1 - math.random(3, 6)
+				y2 = y1 + math.random(3, 6)
+				x2 = math.random(2, W - 2)
+				fill(x1, y1, x2, y2)
+			else
+				y2 = math.random(2, H - 2)
+				x1 = x1 - math.random(3, 6)
+				x2 = x1 + math.random(3, 6)
+				fill(x1, y1, x2, y2)
+			end
+			x1, y1 = x2, y2
+		end
+
+
+--[[		local dirs = {
+			{ x = 1, y = 0 },
+			{ x = -1, y = 0 },
+			{ x = 0, y = 1 },
+			{ x = 0, y = -1 },
+		}
+		local min_dist = 15
+		for i=1,50 do
+			local d = math.random(1, 4)
+			for steps=min_dist, min_dist + math.random(20) do
+				local w = math.random(1, 2)
+				local h = math.random(1, 2)
+				fill(x - w, y - h, x + w, y + h, false)
+				x, y = limit(x + dirs[d].x, y + dirs[d].y)
+			end
+		end
+		--]]
+		borders()
+		instance.dump()
+
+		
+		
+		--[[math.randomseed(os.time())
+		local x = math.random(2, W - 2)
+		local y = math.random(2, H - 2)
+		for i=1,25 do
+			local x1 = x
+			local y1 = y
+			if math.random(1, 10) > 5 then
+				x = math.random(2, W - 2)
+				y = math.random(math.max(y - 5, 2), math.min(y + 5, H - 2))
+			else
+				y = math.random(2, H - 2)
+				x = math.random(math.max(x - 5, 2), math.min(x + 5, W - 2))
+			end
+			local x2 = x
+			local y2 = y
+			fill(x1, y1, x2, y2, true)
+		end
+		instance.dump()
+		
+		instance.layout = conway.apply(instance.layout, W, H)--]]
 		instance.update_tilemap()
 	end
 
@@ -153,15 +244,13 @@ function M.create(url, W, H, TILE_SIZE)
 
 	function instance.dump()
 		local l = instance.layout
-		local s = "\n"
 		for y=H,1,-1 do
-			s = s .. ("%2.d"):format(y) .. " "
+			local s = ("%2.d"):format(y) .. " "
 			for x=1,W do
 				s = s .. (l[x][y].wall and "W" or "F")
 			end
-			s  = s .. "\n"
+			print(s)
 		end
-		print(s)
 	end
 	
 	function instance.dumpcost()

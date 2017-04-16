@@ -215,5 +215,5 @@ emitters {
       t_y: 0.0
     }
   }
-  size_mode: SIZE_MODE_AUTO
+  size_mode: SIZE_MODE_MANUAL
 }
