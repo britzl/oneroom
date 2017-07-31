@@ -1,5 +1,3 @@
-local timer = require "ludobits.m.timer"
-
 local M = {}
 
 local timers = {}
@@ -11,29 +9,21 @@ end
 function M.once(seconds, callback)
 	local key = url_to_key(msg.url())
 	timers[key] = timers[key] or {}
-	table.insert(timers[key], timer.once(seconds, callback))
+	table.insert(timers[key], timer.seconds(seconds, callback))
 end
 
 
 function M.every(seconds, callback)
 	local key = url_to_key(msg.url())
 	timers[key] = timers[key] or {}
-	table.insert(timers[key], timer.every(seconds, callback))
+	table.insert(timers[key], timer.repeating(seconds, callback))
 end
 
 function M.stop()
 	local key = url_to_key(msg.url())
-	timers[key] = {}
-end
-
-function M.update(dt)
-	local key = url_to_key(msg.url())
-	if not timers[key] then
-		return
-	end
-	
-	for _,t in pairs(timers[key]) do
-		t.update(dt)
+	timers[key] = timers[key] or {}
+	while #timers[key] > 0 do
+		timer.cancel(table.remove(timers[key]))
 	end
 end
 

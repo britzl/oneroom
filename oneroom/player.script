@@ -4,6 +4,7 @@ local render_settings = require "render.settings"
 local flow = require "ludobits.m.flow"
 local sounds = require "oneroom.sounds"
 local explosions = require "oneroom.explosions"
+local camera = require "orthographic.camera"
 
 local CONTACT_POINT_RESPONSE = hash("contact_point_response")
 local COLLISION_RESPONSE = hash("collision_response")
@@ -191,6 +192,9 @@ function init(self)
 	self.weapon_angle = vmath.quat()
 	broadcast.register(NEW_GAME)
 	msg.post("melee", "disable")
+	self.camera_id = go.get_id("/camera")
+	camera.follow(self.camera_id, go.get_id(), 0.1)
+	camera.deadzone(self.camera_id, 50, 40, 50, 40)
 end
 
 
@@ -238,7 +242,6 @@ function update(self, dt)
 		self.bullets_fired_in_burts = 0
 	end
 	
-	local camera = go.get_position("game:/camera")
 	local pos = go.get_position()
 	pos = pos + self.velocity * dt
 	go.set_position(pos)
@@ -275,18 +278,16 @@ function on_input(self, action_id, action)
 	
 	input.update(action_id, action)
 	if not action_id then
-		local camera = go.get_position("game:/camera")
-		local pos = go.get_world_position() - camera
+		local camera_pos = camera.screen_to_world(self.camera_id, vmath.vector3(action.x, action.y, 0))
+		local pos = go.get_world_position() - camera_pos
 		local angle = -math.atan2((action.x / ZOOM) - pos.x, (action.y / ZOOM) - pos.y)
 		local quat = vmath.quat_rotation_z(angle)
 		self.weapon_angle = quat
 		
-		local target = vmath.vector3(action.x / ZOOM, action.y / ZOOM, 0)
-
 		go.set("lasersight#script", "angle", quat)
-		go.set("lasersight#script", "target", target)
+		go.set("lasersight#script", "target", camera_pos)
 		
-		go.set_position(camera + target, "crosshair")
+		go.set_position(camera_pos, "crosshair")
 	elseif action_id == RELOAD and action.released then
 		if self.magazines > 0 then
 			if not self.reloading then

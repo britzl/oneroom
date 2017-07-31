@@ -1,18 +1,18 @@
 [project]
 title = OverrunRoom
 version = 0.1
-dependencies = https://github.com/britzl/ludobits/archive/master.zip
+dependencies = https://github.com/britzl/ludobits/archive/1.2.zip, https://github.com/britzl/defold-orthographic/archive/1.1.zip, https://github.com/britzl/defold-timer/archive/master.zip
 
 [bootstrap]
 main_collection = /oneroom/oneroom.collectionc
-render = /render/gb.renderc
+render = /render/orthographic.renderc
 
 [input]
 game_binding = /input/game.input_bindingc
 
 [display]
-width = 960
-height = 864
+width = 1280
+height = 960
 
 [physics]
 scale = 0.02

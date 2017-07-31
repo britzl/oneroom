@@ -136,10 +136,6 @@ end
 
 function update(self, dt)
 	flow.update(dt)
-	timers.update(dt)
-	local camera_offset = vmath.vector3(render_settings.CURRENT_WIDTH / render_settings.ZOOM / 2, render_settings.CURRENT_HEIGHT / render_settings.ZOOM / 2, 0)
-	go.set_position(go.get_position("player/player") - camera_offset, "game:/camera")
-
 end
 
 
