@@ -100,74 +100,19 @@ function M.create(url, W, H, TILE_SIZE)
 	
 	function instance.generate()
 		instance.clear()
-		fill(1, 1, W, H, true)
-		
+		fill(1, 1, W, H, false)		
 		math.randomseed(os.time())
-		
-		
-		local x1 = math.random(2, W - 2)
-		local y1 = math.random(2, H - 2)
-		local x2, y2
-
-		for i=1,15 do
-			
-			if i % 2 == 0 then
-				y1 = y1 - math.random(3, 6)
-				y2 = y1 + math.random(3, 6)
-				x2 = math.random(2, W - 2)
-				fill(x1, y1, x2, y2)
-			else
-				y2 = math.random(2, H - 2)
-				x1 = x1 - math.random(3, 6)
-				x2 = x1 + math.random(3, 6)
-				fill(x1, y1, x2, y2)
-			end
-			x1, y1 = x2, y2
-		end
-
-
---[[		local dirs = {
-			{ x = 1, y = 0 },
-			{ x = -1, y = 0 },
-			{ x = 0, y = 1 },
-			{ x = 0, y = -1 },
-		}
-		local min_dist = 15
-		for i=1,50 do
-			local d = math.random(1, 4)
-			for steps=min_dist, min_dist + math.random(20) do
-				local w = math.random(1, 2)
-				local h = math.random(1, 2)
-				fill(x - w, y - h, x + w, y + h, false)
-				x, y = limit(x + dirs[d].x, y + dirs[d].y)
-			end
-		end
-		--]]
 		borders()
-		instance.dump()
-
-		
-		
-		--[[math.randomseed(os.time())
-		local x = math.random(2, W - 2)
-		local y = math.random(2, H - 2)
-		for i=1,25 do
-			local x1 = x
-			local y1 = y
-			if math.random(1, 10) > 5 then
-				x = math.random(2, W - 2)
-				y = math.random(math.max(y - 5, 2), math.min(y + 5, H - 2))
-			else
-				y = math.random(2, H - 2)
-				x = math.random(math.max(x - 5, 2), math.min(x + 5, W - 2))
+		for i=1,W*H*0.05 do
+			if math.random(1, 10) > 3 then
+				local x = math.random(3, W-2)
+				local y = math.random(3, H-2)
+				fill(x,y,x,y, true)
 			end
-			local x2 = x
-			local y2 = y
-			fill(x1, y1, x2, y2, true)
 		end
 		instance.dump()
 		
-		instance.layout = conway.apply(instance.layout, W, H)--]]
+		instance.layout = conway.apply(instance.layout, W, H)
 		instance.update_tilemap()
 	end
 

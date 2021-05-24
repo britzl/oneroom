@@ -9,14 +9,14 @@ end
 function M.once(seconds, callback)
 	local key = url_to_key(msg.url())
 	timers[key] = timers[key] or {}
-	table.insert(timers[key], timer.seconds(seconds, callback))
+	table.insert(timers[key], timer.delay(seconds, false, callback))
 end
 
 
 function M.every(seconds, callback)
 	local key = url_to_key(msg.url())
 	timers[key] = timers[key] or {}
-	table.insert(timers[key], timer.repeating(seconds, callback))
+	table.insert(timers[key], timer.delay(seconds, true, callback))
 end
 
 function M.stop()

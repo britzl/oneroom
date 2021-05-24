@@ -83,8 +83,8 @@ instances {
   id: "camera"
   prototype: "/orthographic/camera.go"
   position {
-    x: 0.0
-    y: 0.0
+    x: 240.0
+    y: 160.0
     z: 0.0
   }
   rotation {
@@ -96,8 +96,23 @@ instances {
   component_properties {
     id: "script"
     properties {
+      id: "near_z"
+      value: "-10.0"
+      type: PROPERTY_TYPE_NUMBER
+    }
+    properties {
+      id: "far_z"
+      value: "10.0"
+      type: PROPERTY_TYPE_NUMBER
+    }
+    properties {
+      id: "zoom"
+      value: "2.0"
+      type: PROPERTY_TYPE_NUMBER
+    }
+    properties {
       id: "projection"
-      value: "FIXED_ZOOM_3"
+      value: "FIXED_ZOOM"
       type: PROPERTY_TYPE_HASH
     }
   }
@@ -150,6 +165,7 @@ embedded_instances {
   "  id: \"barrelfactory\"\n"
   "  type: \"factory\"\n"
   "  data: \"prototype: \\\"/oneroom/barrel.go\\\"\\n"
+  "load_dynamically: false\\n"
   "\"\n"
   "  position {\n"
   "    x: 0.0\n"
@@ -167,6 +183,7 @@ embedded_instances {
   "  id: \"blobfactory\"\n"
   "  type: \"factory\"\n"
   "  data: \"prototype: \\\"/oneroom/blob.go\\\"\\n"
+  "load_dynamically: false\\n"
   "\"\n"
   "  position {\n"
   "    x: 0.0\n"
@@ -184,6 +201,7 @@ embedded_instances {
   "  id: \"bulletfactory\"\n"
   "  type: \"factory\"\n"
   "  data: \"prototype: \\\"/oneroom/bullet.go\\\"\\n"
+  "load_dynamically: false\\n"
   "\"\n"
   "  position {\n"
   "    x: 0.0\n"
@@ -201,6 +219,7 @@ embedded_instances {
   "  id: \"explosionfactory\"\n"
   "  type: \"factory\"\n"
   "  data: \"prototype: \\\"/oneroom/explosion.go\\\"\\n"
+  "load_dynamically: false\\n"
   "\"\n"
   "  position {\n"
   "    x: 0.0\n"
@@ -218,6 +237,7 @@ embedded_instances {
   "  id: \"powerupfactory\"\n"
   "  type: \"factory\"\n"
   "  data: \"prototype: \\\"/oneroom/powerup.go\\\"\\n"
+  "load_dynamically: false\\n"
   "\"\n"
   "  position {\n"
   "    x: 0.0\n"
@@ -235,6 +255,7 @@ embedded_instances {
   "  id: \"shellfactory\"\n"
   "  type: \"factory\"\n"
   "  data: \"prototype: \\\"/oneroom/shell.go\\\"\\n"
+  "load_dynamically: false\\n"
   "\"\n"
   "  position {\n"
   "    x: 0.0\n"
@@ -252,6 +273,7 @@ embedded_instances {
   "  id: \"skullfactory\"\n"
   "  type: \"factory\"\n"
   "  data: \"prototype: \\\"/oneroom/skull.go\\\"\\n"
+  "load_dynamically: false\\n"
   "\"\n"
   "  position {\n"
   "    x: 0.0\n"
@@ -269,6 +291,7 @@ embedded_instances {
   "  id: \"smallblobfactory\"\n"
   "  type: \"factory\"\n"
   "  data: \"prototype: \\\"/oneroom/smallblob.go\\\"\\n"
+  "load_dynamically: false\\n"
   "\"\n"
   "  position {\n"
   "    x: 0.0\n"
@@ -410,10 +433,10 @@ embedded_instances {
   "line_break: false\\n"
   "text: \\\"Label\\\"\\n"
   "font: \\\"/assets/font/smallest_pixel-7.font\\\"\\n"
-  "material: \\\"/assets/font/pixelfont.material\\\"\\n"
+  "material: \\\"/builtins/fonts/label.material\\\"\\n"
   "\"\n"
   "  position {\n"
-  "    x: 160.0\n"
+  "    x: 240.0\n"
   "    y: 8.0\n"
   "    z: 0.0\n"
   "  }\n"
@@ -464,11 +487,11 @@ embedded_instances {
   "line_break: false\\n"
   "text: \\\"HEALTH: 10\\\"\\n"
   "font: \\\"/assets/font/smallest_pixel-7.font\\\"\\n"
-  "material: \\\"/assets/font/pixelfont.material\\\"\\n"
+  "material: \\\"/builtins/fonts/label.material\\\"\\n"
   "\"\n"
   "  position {\n"
-  "    x: 160.0\n"
-  "    y: 284.0\n"
+  "    x: 240.0\n"
+  "    y: 308.0\n"
   "    z: 0.0\n"
   "  }\n"
   "  rotation {\n"
@@ -505,6 +528,9 @@ embedded_instances {
   "looping: 0\\n"
   "group: \\\"master\\\"\\n"
   "gain: 1.0\\n"
+  "pan: 0.0\\n"
+  "speed: 1.0\\n"
+  "loopcount: 0\\n"
   "\"\n"
   "  position {\n"
   "    x: 0.0\n"
@@ -525,6 +551,9 @@ embedded_instances {
   "looping: 0\\n"
   "group: \\\"master\\\"\\n"
   "gain: 1.0\\n"
+  "pan: 0.0\\n"
+  "speed: 1.0\\n"
+  "loopcount: 0\\n"
   "\"\n"
   "  position {\n"
   "    x: 0.0\n"
@@ -545,6 +574,9 @@ embedded_instances {
   "looping: 0\\n"
   "group: \\\"master\\\"\\n"
   "gain: 1.0\\n"
+  "pan: 0.0\\n"
+  "speed: 1.0\\n"
+  "loopcount: 0\\n"
   "\"\n"
   "  position {\n"
   "    x: 0.0\n"
@@ -565,6 +597,9 @@ embedded_instances {
   "looping: 0\\n"
   "group: \\\"master\\\"\\n"
   "gain: 1.0\\n"
+  "pan: 0.0\\n"
+  "speed: 1.0\\n"
+  "loopcount: 0\\n"
   "\"\n"
   "  position {\n"
   "    x: 0.0\n"

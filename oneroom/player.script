@@ -1,6 +1,6 @@
 local input = require "ludobits.m.input"
 local broadcast = require "ludobits.m.broadcast"
-local render_settings = require "render.settings"
+local settings = require "oneroom.settings"
 local flow = require "ludobits.m.flow"
 local sounds = require "oneroom.sounds"
 local explosions = require "oneroom.explosions"
@@ -42,7 +42,7 @@ local FLAME_EXPLOSION = hash("flame")
 
 local PLAYER_SPEED = 75
 
-local ZOOM = render_settings.ZOOM
+local CAMERA_ID = hash("/camera")
 
 go.property("health", 10)
 
@@ -192,9 +192,8 @@ function init(self)
 	self.weapon_angle = vmath.quat()
 	broadcast.register(NEW_GAME)
 	msg.post("melee", "disable")
-	self.camera_id = go.get_id("/camera")
-	camera.follow(self.camera_id, go.get_id(), 0.1)
-	camera.deadzone(self.camera_id, 50, 40, 50, 40)
+	--camera.follow(CAMERA_ID, go.get_id(), { lerp = 0.1 })
+	--camera.deadzone(CAMERA_ID, 50, 40, 50, 40)
 end
 
 
@@ -278,9 +277,10 @@ function on_input(self, action_id, action)
 	
 	input.update(action_id, action)
 	if not action_id then
-		local camera_pos = camera.screen_to_world(self.camera_id, vmath.vector3(action.x, action.y, 0))
-		local pos = go.get_world_position() - camera_pos
-		local angle = -math.atan2((action.x / ZOOM) - pos.x, (action.y / ZOOM) - pos.y)
+		local camera_pos = camera.screen_to_world(CAMERA_ID, vmath.vector3(action.x, action.y, 0))
+		print(camera_pos, go.get_world_position())
+		local pos = camera_pos - go.get_world_position()
+		local angle = -math.atan2(-pos.x, -pos.y)
 		local quat = vmath.quat_rotation_z(angle)
 		self.weapon_angle = quat
 		
