@@ -20,7 +20,7 @@ function update(self, dt)
 	local pos = go.get_world_position()
 	local to = pos + vmath.rotate(self.angle, get_length())
 	if vmath.length(pos - to) > 0 then
-		physics.ray_cast(pos, to, GROUPS)
+		physics.raycast_async(pos, to, GROUPS)
 		local hit = physics.raycast(pos, to, GROUPS)
 		if hit then
 			go.set_rotation(self.angle)
